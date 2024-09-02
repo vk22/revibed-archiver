@@ -1,0 +1,44 @@
+.table-col-1,
+.table-col-2,
+.table-col-3,
+.table-col-4 {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.table-col-1-half {
+  flex: 0 0 2%;
+  max-width: 2%;
+}
+
+.table-col-1 {
+  flex: 0 0 4%;
+  max-width: 4%;
+}
+
+.table-col-2 {
+  flex: 0 0 9%;
+  max-width: 9%;
+}
+
+.table-col-3 {
+  flex: 0 0 16%;
+  max-width: 16%;
+}
+
+.table-col-4 {
+  flex: 0 0 22%;
+  max-width: 22%;
+}
+
+.table-col-10 {
+  flex: 0 0 80%;
+  max-width: 90%;
+}
+
+.table-col-rows {
+  display: flex;
+  flex-direction: column;
+}
