@@ -319,8 +319,8 @@ function getArtistName(artists, artist) {
 async function setMetadataRESTORED(files, releaseData, folderDir, pathToPic, needFLAC, matchType) {
   let errors = []
   let matchFunction = undefined
-   console.log('files ', files)
-   console.log('releaseData ', releaseData)
+  console.log('files ', files)
+  console.log('releaseData ', releaseData)
 
   return new Promise(function (resolve, reject) {
     const {
@@ -358,7 +358,7 @@ async function setMetadataRESTORED(files, releaseData, folderDir, pathToPic, nee
             if (tracklistItem.position) {
               return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
             }
-            
+
           })
           console.log('setMetadataRESTORED trackData ', trackData)
           //// если есть совпадение
@@ -498,6 +498,23 @@ async function addID3TagsOnly(path, pathToPic, tagsData, filename, dir, needFLAC
   })
 }
 
+function ffmpegImageConvert(path, path2) {
+  return new Promise((resolve, reject) => {
+    const magick = child_process.spawn(ffmpegPath, ['-i', path, path2])
+
+    magick.on('error', function (err) {
+      console.log('magickConvert error: ' + err)
+      reject()
+    })
+    magick.on('exit', (statusCode) => {
+      if (statusCode === 0) {
+        console.log('magickConvert done')
+        resolve(true)
+      }
+    })
+  })
+}
+
 async function convertToFlac(filePath, filaname, dir) {
   return new Promise(function (resolve, reject) {
     let extension = extname(filaname)
@@ -583,5 +600,5 @@ module.exports = {
   setID3Tags,
   convertToFlac,
   changeFlac,
-  ffmpegPath
+  ffmpegImageConvert
 }

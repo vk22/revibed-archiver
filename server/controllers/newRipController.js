@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const { join, extname, basename } = require('path')
-const { readID3Tags, setID3Tags } = require('./id3Utils')
+const { readID3Tags, setID3Tags, ffmpegImageConvert } = require('./id3Utils')
 const MyStore = require('./store.js')
 const store = new MyStore({
   configReleases: 'anton-releases-db',
@@ -49,7 +49,7 @@ async function parseFiles(list, dir, needConvertCovers) {
       if (needConvertCovers) {
         const file2 = changeCoverName(file)
         const fullPath2 = `${dir}/${file2}`
-        const magickConvertRes = await magickConvert(fullPath, fullPath2)
+        const magickConvertRes = await ffmpegImageConvert(fullPath, fullPath2)
         console.log('magickConvertRes ', magickConvertRes)
         if (magickConvertRes && fs.existsSync(fullPath)) {
           await fs.unlinkSync(fullPath)
@@ -58,7 +58,6 @@ async function parseFiles(list, dir, needConvertCovers) {
           if (!imageSize) {
             fileErrors.push('getImageSize')
           }
-
           visual.push({
             filename: file2,
             filepath: fullPath2,
@@ -89,7 +88,7 @@ const checkDropedFolder = async (req, res, next) => {
   const folder = req.body.folder
   project.clearData()
   const list = fs.readdirSync(folder)
-  const folderFiles = await parseFiles(list, folder, false)
+  const folderFiles = await parseFiles(list, folder, true)
   project.setInitialData(folder)
   res.json({
     success: true,

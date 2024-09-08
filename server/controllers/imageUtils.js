@@ -14,13 +14,13 @@ async function convertImage(oldPath, newPath, imageSize) {
           width: RESIZE_WIDTH
         })
         .toFile(newPath)
-        .then( data => { console.log('data ', data) })
-        .catch( err => { console.log('err ', err) });
+        .then(data => { console.log('data ', data) })
+        .catch(err => { console.log('err ', err) });
     } else {
       await sharp(oldPath, { failOnError: false })
         .toFile(newPath)
-        .then( data => { console.log('data ', data) })
-        .catch( err => { console.log('err ', err) });
+        .then(data => { console.log('data ', data) })
+        .catch(err => { console.log('err ', err) });
     }
 
     await fs.unlinkSync(oldPath)
@@ -70,7 +70,7 @@ function createCoverPic(mainImage, coverFilePath) {
   return new Promise(function (resolve, reject) {
     if (imageSize > 600) {
       try {
-        ;(async () => {
+        ; (async () => {
           await sharp(mainImage.filepath)
             .resize(600, 600)
             .jpeg({
@@ -91,7 +91,7 @@ function createCoverPic(mainImage, coverFilePath) {
       }
     } else {
       try {
-        ;(async () => {
+        ; (async () => {
           await sharp(mainImage.filepath)
             .jpeg({
               quality: IMG_QUALITY
