@@ -2,20 +2,18 @@
   <div class="top-tools-panel" v-if="folderFilesReady">
     <div class="l-col">
       <div class="btn-wrap">
-        <button class="btn" @click="checkFiles"><SpectroIcon /></button>
+        <button class="btn" @click="checkFiles">
+          <SpectroIcon />
+        </button>
       </div>
       <div class="input-wrap">
         <input type="text" v-model="discogsLinkTemp" placeholder="Discogs Link" />
       </div>
       <div class="btn-wrap">
-        <button class="btn" @click="parseDiscogs()" :class="{ disable: !discogsLinkTemp }"
-          >Discogs</button
-        >
+        <button class="btn" @click="parseDiscogs()" :class="{ disable: !discogsLinkTemp }">Discogs</button>
       </div>
       <div class="btn-wrap">
-        <button class="btn main" @click="saveDiscogsTags()" :class="{ disable: !discogsRequest }"
-          >Add Tags</button
-        >
+        <button class="btn main" @click="saveDiscogsTags()" :class="{ disable: !discogsRequest }">Add Tags</button>
       </div>
       <div class="checkbox-wrap">
         <input type="checkbox" id="matchType" v-model="matchType" @change="setMatchType($event)" />
@@ -34,18 +32,11 @@
       <!-- <v-checkbox color="dark" class="mt-0" v-model="rip.needFLAC" label="FLAC" /> -->
       <div class="select-wrap">
         <!-- <label>Source</label> -->
-        <v-select
-          :items="sourcesList"
-          v-model="sourceSelected"
-          variant="outlined"
-          density="compact"
-          v-on:change="changeFilenameDone()"
-        ></v-select>
+        <v-select :items="sourcesList" v-model="sourceSelected" variant="outlined" density="compact"
+          v-on:change="changeFilenameDone()"></v-select>
       </div>
       <button class="btn" @click="clearState"><v-icon>mdi-delete</v-icon></button>
-      <button class="btn save" :class="{ disable: !canSave }" @click="archiveProject()"
-        >Archive</button
-      >
+      <button class="btn save" :class="{ disable: !canSave }" @click="archiveProject()">Archive</button>
     </div>
   </div>
 </template>
@@ -95,11 +86,20 @@ function parseDiscogsLink() {
     return id
   }
 }
-function parseDiscogs() {
+async function parseDiscogs() {
   store.setLoading({ state: true })
   if (!discogsLinkTemp.value) return
   const releaseID = parseDiscogsLink()
   if (!releaseID) return
+  /// Проверка на лейбл
+  const checkReleaseBefore = await store.checkRelease(releaseID)
+  console.log('checkReleaseBefore ', checkReleaseBefore)
+  let checkReleaseBeforeHandledArr = Object.values(checkReleaseBefore.data.data)
+  let checkReleaseBeforeHandled = checkReleaseBeforeHandledArr.some(item => item === 'warning' || item === 'blocked')
+  if (checkReleaseBeforeHandled) {
+    alert(JSON.stringify('Dangerous label!'))
+  }
+  /// Проверка на релиз
   const checkRelease = store.getIfprojectExists(releaseID)
   console.log('checkRelease ', checkRelease)
   console.log('isRework ', isRework.value)
@@ -148,7 +148,7 @@ function setDiscogsSubtracksStage(event) {
   store.setDiscogsSubtracksStage(type)
 }
 
-onMounted(() => {})
+onMounted(() => { })
 </script>
 
 <style lang="scss">
@@ -175,20 +175,24 @@ onMounted(() => {})
   }
 
   .l-col {
-    & > div {
+    &>div {
       margin-right: 0.5rem;
     }
   }
+
   .r-col button {
     margin-left: 0.5rem;
   }
+
   .input-wrap {
     margin-right: 0.5rem !important;
     width: 200px;
   }
+
   .checkbox-wrap {
     display: flex;
     align-items: center;
+
     input {
       margin-right: 3px;
     }
@@ -197,6 +201,7 @@ onMounted(() => {})
   .select-wrap {
     width: 200px;
     height: 38px;
+
     .v-input {
       font-size: 0.7rem;
     }

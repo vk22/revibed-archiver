@@ -16,6 +16,22 @@ const RESIZE_WIDTH = 900 //px
 const sharp = require('sharp')
 const Project = require('./project.js')
 const project = new Project()
+let isWorking = false
+
+const checkDropedFolder = async (req, res, next) => {
+  console.log('checkDropedFolder ')
+  isWorking = true
+  const folder = req.body.folder
+  project.clearData()
+  const list = fs.readdirSync(folder)
+  const folderFiles = await parseFiles(list, folder, true)
+  project.setInitialData(folder)
+  res.json({
+    success: true,
+    files: folderFiles,
+    project: project
+  })
+}
 
 function changeCoverName(name) {
   console.log('changeCoverName ', name)
@@ -83,19 +99,7 @@ async function parseFiles(list, dir, needConvertCovers) {
   return { files, visual, errors }
 }
 
-const checkDropedFolder = async (req, res, next) => {
-  console.log('checkDropedFolder ')
-  const folder = req.body.folder
-  project.clearData()
-  const list = fs.readdirSync(folder)
-  const folderFiles = await parseFiles(list, folder, true)
-  project.setInitialData(folder)
-  res.json({
-    success: true,
-    files: folderFiles,
-    project: project
-  })
-}
+
 
 const getFilesFromFolder = async (req, res, next) => {
   const folder = req.body.folder

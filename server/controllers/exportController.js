@@ -9,7 +9,7 @@ const { rimraf, rimrafSync } = require('rimraf')
 const kxFolder = '/Volumes/WD/KX-rips/'
 const kxBDFile = '/Volumes/WD/KX-rips/music-db.json'
 const antonFolder = '/Volumes/WD/MEGA-Marketplace-Final/Anton/'
-const antonFoldersInner = ['hi', 'hi2', 'hi3', 'low', 'low2', 'low3' ]
+const antonFoldersInner = ['hi', 'hi2', 'hi3', 'low', 'low2', 'low3']
 const kxBalanceFolder = '/Volumes/WD/MEGA-Marketplace-Final/kx-balance/'
 const revibedFolder = '/Volumes/WD/MEGA-Marketplace-Final/Revibed/'
 const ytbFolder = '/Volumes/WD/revibed-utils/ytb-files/'
@@ -165,7 +165,7 @@ const getReleaseFunc = async (releases) => {
   //const rips = soldProjects2;
   // let releases = data.releases
   let finalData = []
-  let fileID = 100984
+  let fileID = 101030
 
   for (var i = 0; i < releases.length; i++) {
     let ripData = releases[i]
@@ -285,7 +285,6 @@ const getReleaseFunc = async (releases) => {
       let folderName = releaseID
       let folderHigh = kxBalanceFolder + '/High/' + folderName
       let folderLow = kxBalanceFolder + '/Low/' + folderName
-
       let initPath
       let condition
       if (fs.existsSync(folderHigh)) {
@@ -396,10 +395,6 @@ const getReleaseForYoutube = async (req, res, next) => {
   })
 }
 
-
-
-
-
 async function collectFilesForYoutubeAnton(releaseData) {
   return new Promise((resolve, reject) => {
     let folderName = releaseData.releaseID
@@ -418,6 +413,7 @@ async function collectFilesForYoutubeAnton(releaseData) {
     // } else if (fs.existsSync(audioFolder4)) {
     //   targetFolder = audioFolder4
     // }
+    console.log('getTargetDirAndCondition ', antonFolder, antonFoldersInner, folderName)
     const targetFolder = getTargetDirAndCondition(antonFolder, antonFoldersInner, folderName)
     const targetFolderRestored = `${targetFolder.dir}/RESTORED`
     console.log('targetFolderRestored ', targetFolderRestored)

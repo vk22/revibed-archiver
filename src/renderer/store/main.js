@@ -112,6 +112,15 @@ export const useMainStore = defineStore('main', {
       })
       return response
     },
+    async checkRelease(releaseID) {
+      const response = await axios.post(`${API_URL}/check-release`,
+        { releaseID: releaseID }, {
+        headers: {
+          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+        }
+      })
+      return response
+    },
     async getServerData() {
       console.time('getAllData')
       this.allDataReady = false
@@ -201,6 +210,7 @@ export const useMainStore = defineStore('main', {
       this.countries = data.countries
     },
     async checkDropedFolder() {
+      console.log('checkDropedFolder Store')
       this.setLoading({ state: true })
       const { data } = await axios.post(`http://localhost:8000/api/check-droped-folder/`, {
         folder: this.folderPath
