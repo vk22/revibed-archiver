@@ -1,6 +1,7 @@
 const ProjectService = require("../services/projectService");
 const DiscogsService = require("../services/discogsService");
 const FilesService = require("../services/filesService");
+const ExportService = require("../services/exportService");
 const ErrorsService = require("../services/errorsService");
 
 
@@ -97,7 +98,6 @@ class MainController {
     }
 
   }
-
   async archiveProject(req, res) {
     try {
       const source = req.body.source
@@ -110,6 +110,18 @@ class MainController {
       res.status(500).json(e)
     }
   }
+  async getReleaseForYoutube(req, res) {
+    const releases = req.body.releases
+    const result = await ExportService.sendReleasesToYoutube(releases)
+    res.json(result)
+  }
+
+  async getReleaseForRVBD(req, res,) {
+    const releases = req.body.releases
+    const result = await ExportService.getReleaseForRVBD(releases)
+    res.json(result)
+  }
+
 }
 
 module.exports = new MainController();

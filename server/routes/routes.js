@@ -15,5 +15,8 @@ router.post('/api/delete-file/', MainController.deleteFile)
 router.post('/api/parse-discogs-link', MainController.parseRelease)
 router.post('/api/download-discogs-images', MainController.downloadDiscogsImages)
 
+//// export
+router.post('/api/export-releases-to-rvbd', MainController.getReleaseForRVBD)
+router.post('/api/export-releases-to-youtube', MainController.getReleaseForYoutube)
 
 module.exports = router

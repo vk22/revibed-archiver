@@ -160,10 +160,6 @@ const getReleaseForRVBD = async (req, res, next) => {
 
 const getReleaseFunc = async (releases) => {
   console.log('getReleaseForRVBD ', releases.length)
-  //const rips = fs.readdirSync(filesStoreFolder)
-  //const rips = ripsRemains.split(', ')
-  //const rips = soldProjects2;
-  // let releases = data.releases
   let finalData = []
   let fileID = 101030
 
@@ -224,25 +220,6 @@ const getReleaseFunc = async (releases) => {
       }
     } else if (source === 'Anton') {
       let folderName = releaseID
-      // let folderHigh = antonFolder + '/hi/' + folderName
-      // let folderLow = antonFolder + '/low/' + folderName
-      // let folderHigh2 = antonFolder + '/hi3/' + folderName
-      // let folderLow2 = antonFolder + '/low2/' + folderName
-      // let initPath
-      // let condition
-      // if (fs.existsSync(folderHigh)) {
-      //   initPath = folderHigh
-      //   condition = 'NM'
-      // } else if (fs.existsSync(folderLow)) {
-      //   initPath = folderLow
-      //   condition = 'VG'
-      // } else if (fs.existsSync(folderHigh2)) {
-      //   initPath = folderHigh2
-      //   condition = 'NM'
-      // } else if (fs.existsSync(folderLow2)) {
-      //   initPath = folderLow2
-      //   condition = 'VG'
-      // }
       let targetDir = getTargetDirAndCondition(antonFolder, antonFoldersInner, folderName)
       let initPath = targetDir.dir
       let condition = targetDir.condition
@@ -367,8 +344,6 @@ function zipDirectory(finalVISUAL, finalRESTORED, outPath) {
   })
 }
 
-////
-
 const getReleaseForYoutube = async (req, res, next) => {
   let releases = req.body.releases
   for (var i = 0; i < releases.length; i++) {
@@ -399,20 +374,6 @@ async function collectFilesForYoutubeAnton(releaseData) {
   return new Promise((resolve, reject) => {
     let folderName = releaseData.releaseID
     let path, filename
-    // const audioFolder1 = antonFolder + '/hi/' + folderName + '/RESTORED'
-    // const audioFolder2 = antonFolder + '/low/' + folderName + '/RESTORED'
-    // const audioFolder3 = antonFolder + '/hi3/' + folderName + '/RESTORED'
-    // const audioFolder4 = antonFolder + '/low2/' + folderName + '/RESTORED'
-    // let targetFolder
-    // if (fs.existsSync(audioFolder1)) {
-    //   targetFolder = audioFolder1
-    // } else if (fs.existsSync(audioFolder2)) {
-    //   targetFolder = audioFolder2
-    // } else if (fs.existsSync(audioFolder3)) {
-    //   targetFolder = audioFolder3
-    // } else if (fs.existsSync(audioFolder4)) {
-    //   targetFolder = audioFolder4
-    // }
     console.log('getTargetDirAndCondition ', antonFolder, antonFoldersInner, folderName)
     const targetFolder = getTargetDirAndCondition(antonFolder, antonFoldersInner, folderName)
     const targetFolderRestored = `${targetFolder.dir}/RESTORED`
