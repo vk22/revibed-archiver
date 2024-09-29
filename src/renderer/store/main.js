@@ -230,8 +230,8 @@ export const useMainStore = defineStore('main', {
           this.mainImage = this.folderDroppedData.visual[0]
         }
       }
-      if (data.project.errors) {
-        this.globalErrors = data.project.errors
+      if (data.files.errors) {
+        this.globalErrors = data.files.errors
       }
       this.folderFilesReady = true
     },
@@ -249,8 +249,8 @@ export const useMainStore = defineStore('main', {
     setFilesData(data) {
       console.log('setFilesData')
       this.folderDroppedData = data.files
-      if (data.project.errors) {
-        this.globalErrors = data.project.errors
+      if (data.files.errors) {
+        this.globalErrors = data.files.errors
       }
     },
     async checkFiles() {
@@ -320,6 +320,7 @@ export const useMainStore = defineStore('main', {
       console.log('archiveProject ', data)
       if (data.success) {
         this.setLoading({ state: false, finish: true })
+        this.$reset
       }
     },
     async editImage(imageData) {

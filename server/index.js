@@ -12,7 +12,7 @@ app.use(
   })
 )
 app.use(express.json())
-app.use(require('./routes/newrip'))
+app.use(require('./routes/routes'))
 app.use(require('./routes/user'))
 // app.use("/", server);
 // app.use("/api", api);

@@ -199,7 +199,7 @@ onMounted(() => { })
   }
 
   .select-wrap {
-    width: 200px;
+    width: 140px;
     height: 38px;
 
     .v-input {

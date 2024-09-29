@@ -7,7 +7,7 @@ function prepareReleaseData(discogsReleaseData) {
       discogsReleaseData.formats !== undefined ? discogsReleaseData.formats[0].name : ''
     const formatDescription =
       discogsReleaseData.formats !== undefined &&
-      discogsReleaseData.formats[0].descriptions != undefined
+        discogsReleaseData.formats[0].descriptions != undefined
         ? discogsReleaseData.formats[0].descriptions[0]
         : ''
 
@@ -79,6 +79,20 @@ function prepareReleaseData(discogsReleaseData) {
 
     resolve(releaseDataFinal)
   })
+}
+
+function getArtistName(artists, artist) {
+  if (artists) {
+    let artistsNames = []
+    artists.forEach((item) => {
+      let name = item.anv ? item.anv : item.name
+      let nameHandled = artistNameHandler(name)
+      artistsNames.push(nameHandled)
+    })
+    return artistsNames.join(', ')
+  } else {
+    return artist
+  }
 }
 
 /// remove artist count from name
@@ -170,6 +184,7 @@ function renameFolder(data) {
 
 module.exports = {
   prepareReleaseData,
+  getArtistName,
   artistNameHandler,
   removeRawFromName,
   base64_encode,
