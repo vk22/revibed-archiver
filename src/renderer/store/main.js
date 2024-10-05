@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-//const API_URL = 'http://localhost:3000';
-const API_URL = 'http://labels.kx-streams.com/api'
-const API_URL2 = 'https://system-api.revibed.com'
+//const API_URL_LABELS = 'http://localhost:3000';
+const API_URL_LABELS = 'http://labels.kx-streams.com/api'
+const API_URL_REVIBED = 'https://system-api.revibed.com'
 const tokenRvbd = 'ozs6tZrfHNCSS4HnfRPvpvgVGbBj2JakfPyEXAtJcXukGNxCouBW2Gs6z7STZEfVyh4Tmg'
 
 export const useMainStore = defineStore('main', {
@@ -87,25 +87,25 @@ export const useMainStore = defineStore('main', {
       this.mainImage = path
     },
     async getRevibedGoods() {
-      const response = await axios.get(`${API_URL2}/goods?size=5000`, {
+      const response = await axios.get(`${API_URL_REVIBED}/goods?size=5000`, {
         headers: { Authorization: `Bearer ${tokenRvbd}` }
       })
       return response
     },
     async getYoutubes() {
-      const response = await axios.get(`${API_URL}/get-youtubes`)
+      const response = await axios.get(`${API_URL_LABELS}/get-youtubes`)
       return response
     },
     async getLabels() {
-      const response = await axios.get(`${API_URL}/get-labels`)
+      const response = await axios.get(`${API_URL_LABELS}/get-labels`)
       return response
     },
     async getArtists() {
-      const response = await axios.get(`${API_URL}/get-artists`)
+      const response = await axios.get(`${API_URL_LABELS}/get-artists`)
       return response
     },
     async getServerDataReleases() {
-      const response = await axios.get(`${API_URL}/get-releases`, {
+      const response = await axios.get(`${API_URL_LABELS}/get-releases`, {
         headers: {
           'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
         }
@@ -113,7 +113,7 @@ export const useMainStore = defineStore('main', {
       return response
     },
     async checkRelease(releaseID) {
-      const response = await axios.post(`${API_URL}/check-release`,
+      const response = await axios.post(`${API_URL_LABELS}/check-release`,
         { releaseID: releaseID }, {
         headers: {
           'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
@@ -232,6 +232,9 @@ export const useMainStore = defineStore('main', {
       }
       if (data.files.errors) {
         this.globalErrors = data.files.errors
+      }
+      if (data.errors) {
+        this.globalErrors = data.errors
       }
       this.folderFilesReady = true
     },

@@ -1,16 +1,3 @@
-<script setup>
-import MainSibebar from '@/renderer/components/MainSibebar.vue'
-// import LoginPage from '@/renderer/components/LoginPage.vue'
-import { onMounted, computed } from 'vue'
-import { useMainStore } from '@/renderer/store/main'
-const store = useMainStore()
-const loading = computed(() => {
-  return store.loading
-})
-onMounted(() => {
-  store.getServerData()
-})
-</script>
 <template>
   <div data-app>
     <v-app>
@@ -29,10 +16,12 @@ onMounted(() => {
             <div class="left">
               <router-link class="link" :to="{ name: 'NewProject' }">Add new</router-link>
               <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link>
+
             </div>
             <div class="right">
               <!-- <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link> -->
-              <div class="userkey" v-on:click="userLogout()" v-if="user">{{ user.role }}</div>
+              <router-link class="link" :to="{ name: 'User' }" v-if="user">{{ user.username }}</router-link>
+              <!-- <div class="userkey" v-on:click="userLogout()" v-if="user">{{ user }}</div> -->
             </div>
           </div>
           <div class="main-container" v-if="true">
@@ -43,6 +32,26 @@ onMounted(() => {
     </v-app>
   </div>
 </template>
+
+<script setup>
+import MainSibebar from '@/renderer/components/MainSibebar.vue'
+// import LoginPage from '@/renderer/components/LoginPage.vue'
+import { onMounted, computed } from 'vue'
+import { useMainStore } from '@/renderer/store/main'
+import { useUserStore } from '@/renderer/store/user'
+const authStore = useUserStore()
+const store = useMainStore()
+const loading = computed(() => {
+  return store.loading
+})
+const user = computed(() => {
+  return authStore.user
+})
+onMounted(() => {
+  store.getServerData()
+})
+</script>
+
 
 <!-- <template>
   <DefaultLayout>
@@ -107,6 +116,7 @@ onMounted(() => {
     display: flex;
     height: 100%;
   }
+
   .right {
     // border-left: 1px solid #3a3a3a;
     display: flex;
@@ -119,6 +129,7 @@ onMounted(() => {
       cursor: pointer;
     }
   }
+
   .link {
     display: flex;
     height: 100%;
@@ -128,12 +139,14 @@ onMounted(() => {
     border-right: 1px solid #3a3a3a;
     font-weight: 600;
     letter-spacing: 0.15px;
+
     // background: #fff;
     &:hover {
       color: #ffffff;
       background: #222222;
       // border-bottom: 3px solid #e1e1e1;
     }
+
     &.router-link-active {
       //background: $color_green;
       background: #111111;
@@ -173,4 +186,3 @@ onMounted(() => {
   }
 }
 </style>
-@/renderer/store/main

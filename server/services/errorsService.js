@@ -1,5 +1,7 @@
 class ErrorsService {
-  errors = []
+  constructor() {
+    this.errors = []
+  }
   add(data) {
     const checkError = this.errors.includes(data)
     if (!checkError) {
@@ -7,6 +9,13 @@ class ErrorsService {
     }
     return this
   }
+  getAll() {
+    return this.errors
+  }
+  clear() {
+    this.errors = []
+  }
+
 }
 
 module.exports = new ErrorsService();

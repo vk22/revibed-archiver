@@ -3,47 +3,20 @@ const sharp = require('sharp')
 const { readdirSync, renameSync } = require('fs')
 const { join, extname, basename } = require('path')
 const child_process = require('child_process')
-const path = require('path')
 const { ByteVector, File, PictureType, Picture } = require('node-taglib-sharp')
-const archiver = require('archiver')
-const log = require('electron-log')
-const electron = require('electron')
-const ffbinaries = require('ffbinaries')
-const platform = ffbinaries.detectPlatform()
-const ffmpegBinFolder = (electron.app || electron.remote.app).getPath('userData')
-let ffmpegPath, ffprobePath
 const allowedAudioFormats = ['.aiff', '.aif', '.flac', '.wav']
 const allowedVisualFormats = ['.jpg', '.jpeg', '.JPG', '.JPEG', '.png', '.PNG', '.webp']
-function initFFbinaries() {
-  return new Promise((resolve, reject) => {
-    ffbinaries.downloadFiles(
-      ['ffmpeg', 'ffprobe'],
-      { platform: platform, quiet: true, destination: ffmpegBinFolder },
-      (err, data) => {
-        if (err) {
-          return reject(err)
-        }
-        try {
-          ffmpegPath = path.join(ffmpegBinFolder, ffbinaries.getBinaryFilename('ffmpeg', platform))
-          ffprobePath = path.join(
-            ffmpegBinFolder,
-            ffbinaries.getBinaryFilename('ffprobe', platform)
-          )
-          resolve()
-        } catch (err) {
-          reject(err)
-          log.warn('reject ' + err)
-        }
-      }
-    )
-  })
-}
-initFFbinaries()
 const mm = require('music-metadata')
 const { getArtistName } = require('./utils')
 const IMG_QUALITY = 50
 const RESIZE_WIDTH = 900 //px
 
+//// ffmpeg
+const initFFmpeg = require("../services/ffmpegService");
+let ffmpegPath;
+initFFmpeg().then((data) => {
+  ffmpegPath = data
+})
 const matchTypesFunctions = {
   'match-by-title': function (filename, metadataTitle, tracklistItem) {
     return (
@@ -141,6 +114,7 @@ class FilesService {
           })
         }
       } else {
+        console.log(`${file} has forbbiden file extantion`)
         ErrorsService.add(`${file} has forbbiden file extantion`)
       }
     }

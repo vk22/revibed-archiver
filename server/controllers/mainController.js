@@ -3,6 +3,7 @@ const DiscogsService = require("../services/discogsService");
 const FilesService = require("../services/filesService");
 const ExportService = require("../services/exportService");
 const ErrorsService = require("../services/errorsService");
+const UserService = require("../services/userService");
 
 
 class MainController {
@@ -12,10 +13,14 @@ class MainController {
       const folder = req.body.folder;
       FilesService.setInitialData(folder);
       const folderFiles = await FilesService.parseFiles(folder, true);
+      const errors = ErrorsService.getAll()
+      ErrorsService.clear()
       res.json({
         success: true,
-        files: folderFiles
+        files: folderFiles,
+        errors: errors
       })
+
     } catch (e) {
       console.log('eee ', e)
       res.status(500).json(e)
@@ -115,11 +120,32 @@ class MainController {
     const result = await ExportService.sendReleasesToYoutube(releases)
     res.json(result)
   }
-
-  async getReleaseForRVBD(req, res,) {
+  async getReleaseForRVBD(req, res) {
     const releases = req.body.releases
-    const result = await ExportService.getReleaseForRVBD(releases)
+    const userFolders = await UserService.getUserData();
+    const result = await ExportService.getReleaseForRVBD(releases, userFolders)
     res.json(result)
+  }
+  async setUserLocalData(req, res) {
+
+  }
+  async setUserLocalData(req, res) {
+    const data = req.body.data;
+    console.log('setUserLocalData ', data)
+    const setData = await UserService.setUserData(data);
+    if (setData.success) {
+      res.json({
+        success: true
+      })
+    }
+  }
+  async getUserLocalData(req, res) {
+    const data = await UserService.getUserData();
+    if (data) {
+      res.json(data)
+    } else {
+      res.status(500).json(e)
+    }
   }
 
 }

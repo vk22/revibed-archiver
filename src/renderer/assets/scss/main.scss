@@ -274,6 +274,45 @@ a {
   }
 }
 
+.main-btn {
+  display: block;
+  padding: 1rem 1rem;
+  width: 100%;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  cursor: pointer;
+  transition-property: all;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-out;
+  background-color: #222;
+  border: 1px solid #222;
+
+  // @include for-700-height-only {
+  //   padding: 1rem 0.75rem;
+  // }
+
+  &:hover {
+    // background-color: $mainColorHover;
+    // border: 1px solid $mainColorHover;
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.75;
+
+    &:hover {
+      // background-color: $mainColor;
+      color: #fff;
+      cursor: default;
+    }
+  }
+}
+
 img[lazy='error'] {
   /*your style here*/
 }

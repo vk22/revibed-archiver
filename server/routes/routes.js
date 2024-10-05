@@ -19,4 +19,8 @@ router.post('/api/download-discogs-images', MainController.downloadDiscogsImages
 router.post('/api/export-releases-to-rvbd', MainController.getReleaseForRVBD)
 router.post('/api/export-releases-to-youtube', MainController.getReleaseForYoutube)
 
+//// user data
+router.post('/api/user/set-local-data', MainController.setUserLocalData)
+router.get('/api/user/get-local-data', MainController.getUserLocalData)
+
 module.exports = router

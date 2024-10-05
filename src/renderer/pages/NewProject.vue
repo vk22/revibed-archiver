@@ -87,14 +87,14 @@
               <td>
                 <span v-if="Array.isArray(item.metadata.performers)">{{
                   item.metadata.performers.join(', ')
-                }}</span>
+                  }}</span>
                 <span v-else>{{ item.metadata.performers }}</span>
               </td>
               <td>{{ item.metadata.album }}</td>
               <td>
                 <span v-if="Array.isArray(item.metadata.genres)">{{
                   item.metadata.genres.join(', ')
-                }}</span>
+                  }}</span>
                 <span v-else>{{ item.metadata.genres }}</span>
               </td>
               <td style="width: 100px">{{ item.metadata.year }}</td>
@@ -199,11 +199,11 @@ const selectRow = (item) => {
 function debounce(callee, timeoutMs) {
   return function perform(...args) {
     let previousCall = this.lastCall
-    this.lastCall = Date.now()
-    if (previousCall && this.lastCall - previousCall <= timeoutMs) {
-      clearTimeout(this.lastCallTimer)
+    let lastCall = Date.now()
+    if (previousCall && lastCall - previousCall <= timeoutMs) {
+      clearTimeout(lastCallTimer)
     }
-    this.lastCallTimer = setTimeout(() => callee(...args), timeoutMs)
+    let lastCallTimer = setTimeout(() => callee(...args), timeoutMs)
   }
 }
 
