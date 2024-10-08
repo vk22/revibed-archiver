@@ -44,7 +44,12 @@ export const useMainStore = defineStore('main', {
       restoredFilesList: [],
       updated: {},
       errors: [],
-      noFiles: false
+      noFiles: false,
+    },
+    sourceData: {
+      owner: undefined,
+      condition: undefined,
+      quality: undefined
     },
     canSave: false,
     discogsLinkTemp: undefined,
@@ -209,6 +214,12 @@ export const useMainStore = defineStore('main', {
       this.onYoutubeCount = data.onYoutubeCount
       this.countries = data.countries
     },
+    async updateReleasesDB() {
+      const { data } = await axios.post(`http://localhost:8000/api/update-revibed/`, {
+        releases: this.allReleases
+      })
+      console.log('data ', data)
+    },
     async checkDropedFolder() {
       console.log('checkDropedFolder Store')
       this.setLoading({ state: true })
@@ -237,6 +248,11 @@ export const useMainStore = defineStore('main', {
         this.globalErrors = data.errors
       }
       this.folderFilesReady = true
+    },
+    setSourceData(key, value) {
+      this.sourceData[key] = value;
+      console.log('this.sourceData[key] ', this.sourceData[key])
+
     },
     async getFilesFromFolder() {
       this.setLoading({ state: true })
@@ -317,9 +333,10 @@ export const useMainStore = defineStore('main', {
         alert('Choose main image')
       }
     },
-    async archiveProject(sourceData) {
+    async archiveProject() {
       this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, sourceData)
+      console.log('this.sourceData ', this.sourceData)
+      const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, { source: this.sourceData })
       console.log('archiveProject ', data)
       if (data.success) {
         this.setLoading({ state: false, finish: true })

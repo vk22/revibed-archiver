@@ -9,12 +9,41 @@ const store = new MyStore({
 })
 const FormData = require('form-data')
 const fetch = require('node-fetch')
+const axios = require('axios')
 const child_process = require('child_process')
 const initFFmpeg = require("../services/ffmpegService");
+const { _ } = require('core-js')
 let ffmpegPath;
 initFFmpeg().then((data) => {
   ffmpegPath = data
 })
+
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+const antonFoldersInner = ['hi', 'hi2', 'hi3', 'low', 'low2', 'low3']
+// this.kxBalanceFolder = `${revibedStockFolder}/kx-balance/`
+// this.revibedFolder = `${revibedStockFolder}/Revibed/`
+const conditionData = {
+  'M': 3,
+  'NM': 4,
+  'VG+': 5,
+  'VG': 6,
+  'G+': 7,
+  'G': 8,
+  'F': 9,
+  'P': 10
+}
+
+const conditionToQuality = {
+  'M': 'HI',
+  'NM': 'HI',
+  'VG+': 'HI',
+  'VG': 'LOW',
+  'G+': 'LOW',
+  'G': 'LOW',
+  'F': 'LOW',
+  'P': 'LOW'
+}
 
 // const UserService = require("../services/userService");
 
@@ -25,19 +54,7 @@ class ExportService {
 
   constructor() {
     // this.antonFolder = `${revibedStockFolder}/Anton/`
-    this.antonFoldersInner = ['hi', 'hi2', 'hi3', 'low', 'low2', 'low3']
-    // this.kxBalanceFolder = `${revibedStockFolder}/kx-balance/`
-    // this.revibedFolder = `${revibedStockFolder}/Revibed/`
-    this.conditionData = {
-      'M': 3,
-      'NM': 4,
-      'VG+': 5,
-      'VG': 6,
-      'G+': 7,
-      'G': 8,
-      'F': 9,
-      'P': 10
-    }
+
     // this.exportFolder = exportFolder
     // this.exportFolderAnton = `${exportFolder}/Anton/`
     // this.exportFolderRevibed = `${exportFolder}/Revibed/`
@@ -68,7 +85,7 @@ class ExportService {
       const folderName = releaseData.releaseID
       let exportFolder
       if (source === 'Anton') {
-        const exportFolderAnton = this.getTargetDirAndCondition(this.antonFolder, this.antonFoldersInner, folderName);
+        const exportFolderAnton = this.getTargetDirAndCondition(this.antonFolder, antonFoldersInner, folderName);
         exportFolder = `${exportFolderAnton.dir}/RESTORED`
       } else if (source === 'Revibed') {
         exportFolder = this.revibedFolder + folderName + '/RESTORED'
@@ -87,9 +104,9 @@ class ExportService {
 
   getConditionFromFolder(folder) {
     if (Array.from(folder)[0].toUpperCase() === 'H') {
-      return 'VG+'
+      return { condition: 'VG+', quality: 'HI' }
     } else if (Array.from(folder)[0].toUpperCase() === 'L') {
-      return 'VG'
+      return { condition: 'VG', quality: 'LOW' }
     }
   }
 
@@ -97,10 +114,11 @@ class ExportService {
     for (const innerFolder of innerFolders) {
       let dir = `${mainFolder}${innerFolder}/${folderName}`
       if (fs.existsSync(dir)) {
-        let condition = this.getConditionFromFolder(innerFolder)
+        let { condition, quality } = this.getConditionFromFolder(innerFolder)
         return {
           dir: dir,
-          condition: condition
+          condition: condition,
+          quality: quality
         }
       }
     }
@@ -179,6 +197,154 @@ class ExportService {
       stream.on('close', () => resolve())
     })
   }
+  // async updateRevibedDB(releases, userFolders) {
+  //   const storageFolder = `${userFolders.storageFolder}`
+  //   const exportFolder = `${userFolders.exportFolder}`
+  //   for (var i = 0; i < releases.length; i++) {
+
+  //     let ripData = releases[i]
+  //     let source = ripData.source
+  //     let releaseID = ripData.releaseID
+  //     let labelID = ripData.labelID
+  //     let ripID = ripData._id
+  //     // console.log('ripID ', ripID)
+  //     let sourceCondition = undefined
+  //     let quality = undefined
+
+  //     if (source === 'KX') {
+  //       let kxRip = store.getByReleaseID(releaseID)
+  //       // console.log('kxRip ', kxRip)
+  //       if (kxRip) {
+  //         let folderName = kxRip.projectID
+  //         let initPath = kxFolder + '/' + folderName
+
+  //         let visualFolder = initPath + '/VISUAL'
+  //         let restoredFolder = initPath + '/RESTORED'
+  //         let audioFolder = initPath + '/AUDIO'
+
+  //         const exportFolderItem = `${exportFolder}/${source}/`
+  //         const exportFolderItemRelease = `${exportFolderItem}/${releaseID}`
+  //         const exportFolderItemVisual = `${exportFolderItemRelease}/VISUAL/`
+  //         const exportFolderItemRestored = `${exportFolderItemRelease}/RESTORED/`
+
+  //         // if (!fs.existsSync(exportFolderItem)) {
+  //         //   fs.mkdirSync(exportFolderItem)
+  //         // }
+  //         if (!fs.existsSync(exportFolderItemRelease)) {
+  //           console.log('не найден ', kxRip)
+  //         }
+  //         // if (!fs.existsSync(exportFolderItemVisual)) {
+  //         //   fs.mkdirSync(exportFolderItemVisual)
+  //         // }
+  //         // if (!fs.existsSync(exportFolderItemRestored)) {
+  //         //   fs.mkdirSync(exportFolderItemRestored)
+  //         // }
+
+
+  //         // try {
+  //         //   fs.copySync(visualFolder, exportFolderItemVisual)
+  //         //   if (fs.existsSync(restoredFolder)) {
+  //         //     fs.copySync(restoredFolder, exportFolderItemRestored)
+  //         //   } else {
+  //         //     fs.copySync(audioFolder, exportFolderItemRestored)
+  //         //   }
+  //         //   console.log(fileID + ' DONE')
+  //         // } catch (error) {
+  //         //   console.log('error ', error.message)
+  //         // }
+
+  //       } else {
+  //         console.log('not found ', releaseID)
+  //       }
+  //     }
+
+  //     // if (source === 'KX Balance') {
+  //     //   sourceCondition = 'VG+'
+  //     //   quality = 'HI'
+  //     // }
+
+  //     // if (source === 'Anton') {
+  //     //   let folderName = releaseID
+  //     //   let storageFolderSource = `${storageFolder}/${source}/`
+  //     //   let targetDir = this.getTargetDirAndCondition(storageFolderSource, antonFoldersInner, folderName)
+  //     //   // console.log('source ', source)
+  //     //   if (targetDir) {
+  //     //     sourceCondition = targetDir.condition
+  //     //     quality = targetDir.quality
+  //     //     // console.log('Source Condition ', targetDir.condition)
+  //     //     // console.log('Quality ', targetDir.quality)
+  //     //   } else {
+  //     //     console.log(source, ' рип на найден ', releaseID)
+  //     //   }
+
+  //     // } else if (source === 'KX') {
+  //     //   let kxRip = store.getByReleaseID(releaseID)
+  //     //   // console.log('kxRip ', kxRip)
+  //     //   if (kxRip) {
+  //     //     let condition = kxRip.media ? kxRip.media : kxRip.conditionMedia
+  //     //     if (!condition) {
+  //     //       condition = 'VG+'
+  //     //     }
+  //     //     let conditionFinal
+  //     //     if (condition.indexOf('(') > -1) {
+  //     //       conditionFinal = condition.slice(condition.indexOf('(') + 1, condition.indexOf(')'))
+  //     //     } else {
+  //     //       conditionFinal = condition
+  //     //     }
+  //     //     // console.log('source ', source)
+  //     //     // console.log('Source Condition ', conditionFinal)
+  //     //     // console.log('Quality ', conditionToQuality[conditionFinal])
+  //     //     sourceCondition = conditionFinal
+  //     //     quality = conditionToQuality[conditionFinal]
+  //     //   } else {
+  //     //     console.log(source, ' рип на найден ', releaseID)
+  //     //   }
+
+  //     // }
+
+  //     // if (sourceCondition && quality) {
+
+  //     //   const body = {
+  //     //     release: {
+  //     //       releaseID: releaseID,
+  //     //       sourceCondition: sourceCondition,
+  //     //       quality: quality,
+  //     //       labelID: labelID
+  //     //     },
+  //     //     user: "admin"
+  //     //   }
+  //     //   console.log('body ', body)
+
+  //     //   // const response = await fetch(`http://labels.kx-streams.com/api/edit-release/` + ripID, {
+  //     //   //   method: 'PUT', body, headers: {
+  //     //   //     "x-api-key": "l74b9ba9qmext9a6ulniigq8"
+  //     //   //   },
+  //     //   // })
+  //     //   // const json = await response.json();
+  //     //   // console.log("Успех:", JSON.stringify(json));
+
+  //     //   const headers = {
+  //     //     'content-type': 'application/json',
+  //     //     accept: 'application/json',
+  //     //     'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+  //     //   }
+  //     //   try {
+  //     //     const response = await axios.put(`http://labels.kx-streams.com/api/edit-release/` + ripID, body, {
+  //     //       headers: headers
+  //     //     });
+  //     //     console.log('response.data ', response.data)
+
+  //     //   } catch (error) {
+  //     //     console.log('error ', error)
+  //     //   }
+
+
+  //     //   //await sleep(500);
+
+  //     // }
+
+  //   }
+  // }
   async getReleaseForRVBD(releases, userFolders) {
     console.log('getReleaseForRVBD ', releases.length)
     let finalData = []
@@ -199,7 +365,7 @@ class ExportService {
       if (source === 'Anton') {
         let folderName = releaseID
         let storageFolderSource = `${storageFolder}/${source}/`
-        let targetDir = this.getTargetDirAndCondition(storageFolderSource, this.antonFoldersInner, folderName)
+        let targetDir = this.getTargetDirAndCondition(storageFolderSource, antonFoldersInner, folderName)
         console.log('targetDir ', targetDir)
         if (!targetDir) return;
         let initFolder = targetDir.dir
@@ -245,7 +411,7 @@ class ExportService {
           let itemData = {
             file_id: fileID.toString(),
             discogs_release_id: releaseID,
-            condition_id: this.conditionData[condition],
+            condition_id: conditionData[condition],
             condition: condition,
             from_editor: true
           }

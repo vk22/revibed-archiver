@@ -105,13 +105,28 @@ class MainController {
   }
   async archiveProject(req, res) {
     try {
+      // console.log('archiveProject req.body', req.body)
       const source = req.body.source
-      const result = await FilesService.archiveProject(source)
+      const result = {
+        archiver: undefined,
+        revibed: undefined
+      }
+      const responseArchiver = await FilesService.archiveProject();
+      console.log('responseArchiver ', responseArchiver)
+      result.archiver = responseArchiver;
+
+      if (responseArchiver.success) {
+        ///// Save To Revibed
+        const responseRevibed = await ProjectService.sendToRevibed(source)
+        console.log('responseRevibed ', responseRevibed)
+        result.revibed = responseRevibed
+      }
       res.json({
         success: true,
-        result: result
+        result: result,
       })
     } catch (e) {
+      console.log('archiveProject error ', e)
       res.status(500).json(e)
     }
   }
@@ -126,8 +141,11 @@ class MainController {
     const result = await ExportService.getReleaseForRVBD(releases, userFolders)
     res.json(result)
   }
-  async setUserLocalData(req, res) {
-
+  async updateRevibedDB(req, res) {
+    const releases = req.body.releases
+    const userFolders = await UserService.getUserData();
+    const result = await ExportService.updateRevibedDB(releases, userFolders)
+    res.json(result)
   }
   async setUserLocalData(req, res) {
     const data = req.body.data;

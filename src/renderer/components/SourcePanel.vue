@@ -1,37 +1,23 @@
 <template>
-  <div class="top-tools-panel" v-if="folderFilesReady">
+  <div class="source-panel" v-if="folderFilesReady">
     <div class="l-col">
-      <div class="btn-wrap">
-        <button class="btn" @click="checkFiles">
-          <SpectroIcon />
-        </button>
+      <div class="select-wrap">
+        <label>Owners</label>
+        <v-select :items="ownersList" v-model="ownersSelected" variant="outlined" density="compact"
+          @update:modelValue="setSourceDataToStore('owner', ownersSelected)"></v-select>
       </div>
-      <div class="input-wrap">
-        <input type="text" v-model="discogsLinkTemp" placeholder="Discogs Link" />
+      <div class="select-wrap">
+        <label>Media Condition</label>
+        <v-select :items="conditionsList" v-model="conditionsSelected" variant="outlined" density="compact"
+          @update:modelValue="setSourceDataToStore('condition', conditionsSelected)"></v-select>
       </div>
-      <div class="btn-wrap">
-        <button class="btn" @click="parseDiscogs()" :class="{ disable: !discogsLinkTemp }">Discogs</button>
-      </div>
-      <div class="btn-wrap">
-        <button class="btn main" @click="saveDiscogsTags()" :class="{ disable: !discogsRequest }">Add Tags</button>
-      </div>
-      <div class="checkbox-wrap">
-        <input type="checkbox" id="matchType" v-model="matchType" @change="setMatchType($event)" />
-        <label for="matchType">By position</label>
-      </div>
-      <div class="checkbox-wrap">
-        <input type="checkbox" id="discogsSubtracks" @change="setDiscogsSubtracksStage($event)" />
-        <label for="discogsSubtracks">Merge</label>
-      </div>
-      <div class="checkbox-wrap">
-        <input type="checkbox" id="rework" v-model="isRework" />
-        <label for="rework">Rework</label>
+      <div class="select-wrap">
+        <label>Rip Quality</label>
+        <v-select :items="qualityList" v-model="qualitySelected" variant="outlined" density="compact"
+          @update:modelValue="setSourceDataToStore('quality', qualitySelected)"></v-select>
       </div>
     </div>
     <div class="r-col">
-      <!-- <v-checkbox color="dark" class="mt-0" v-model="rip.needFLAC" label="FLAC" /> -->
-      <button class="btn" @click="clearState"><v-icon>mdi-delete</v-icon></button>
-      <button class="btn save" :class="{ disable: !canSave }" @click="archiveProject()">Archive</button>
     </div>
   </div>
 </template>
@@ -59,11 +45,23 @@ const canSave = computed(() => {
 let isRework = ref(null)
 let discogsLinkTemp = ref(undefined)
 let matchType = true
-let sourcesList = ['Anton', 'Revibed', 'KX Balance', 'KX']
-let sourceSelected = ref('Anton')
+let ownersList = ['Anton', 'Revibed', 'KX Balance', 'KX']
+let ownersSelected = ref(null)
+let conditionsList = ['M', 'NM', 'VG+', 'VG', 'G+', 'G', 'F', 'P']
+let conditionsSelected = ref(null)
+let qualityList = ['HI', 'LOW']
+let qualitySelected = ref(null)
+
+// const ownersSelected = computed(() => {
+//   return store.sourceData
+// })
 
 /// Methods
 
+function setSourceDataToStore(key, value) {
+  // console.log('key, value ', key, value)
+  store.setSourceData(key, value)
+}
 function parseDiscogsLink() {
   const arr = discogsLinkTemp.value.split('/')
   const releaseIndex = arr.indexOf('release')
@@ -123,10 +121,9 @@ function clearState() {
   discogsLinkTemp.value = undefined
   // store.clearState()
   store.$reset()
-  // document.location.reload()
 }
 function archiveProject() {
-  store.archiveProject()
+  store.archiveProject({ source: this.sourceSelected })
 }
 function setMatchType(event) {
   console.log('setMatchType ', event.target.checked)
@@ -145,7 +142,7 @@ onMounted(() => { })
 <style lang="scss">
 @import '../assets/scss/main.scss';
 
-.top-tools-panel {
+.source-panel {
   top: 0;
   left: 0;
   width: 100%;
@@ -157,7 +154,7 @@ onMounted(() => { })
   background: #fff;
   padding: 1rem;
   border-bottom: 1px solid #ebebeb;
-  margin-bottom: 0rem;
+  margin-bottom: 1rem;
 
   .l-col,
   .r-col {
@@ -191,7 +188,7 @@ onMounted(() => { })
 
   .select-wrap {
     width: 140px;
-    height: 38px;
+    // height: 28px;
 
     .v-input {
       font-size: 0.7rem;

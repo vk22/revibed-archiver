@@ -69,6 +69,8 @@
 
     <!-- top panel -->
     <TopToolsPanel />
+    <!-- source panel -->
+    <SourcePanel />
     <div class="folder-container" v-if="folderFilesReady">
       <div class="folder-files" v-if="folderFiles.files.length">
         <!-- <div class="folder-files__title">FILES</div> -->
@@ -87,14 +89,14 @@
               <td>
                 <span v-if="Array.isArray(item.metadata.performers)">{{
                   item.metadata.performers.join(', ')
-                  }}</span>
+                }}</span>
                 <span v-else>{{ item.metadata.performers }}</span>
               </td>
               <td>{{ item.metadata.album }}</td>
               <td>
                 <span v-if="Array.isArray(item.metadata.genres)">{{
                   item.metadata.genres.join(', ')
-                  }}</span>
+                }}</span>
                 <span v-else>{{ item.metadata.genres }}</span>
               </td>
               <td style="width: 100px">{{ item.metadata.year }}</td>
@@ -130,6 +132,7 @@
 import { ref } from 'vue'
 import CheckedFiles from '@/renderer/components/CheckedFiles.vue'
 import TopToolsPanel from '@/renderer/components/TopToolsPanel.vue'
+import SourcePanel from '@/renderer/components/SourcePanel.vue'
 
 // import LoginPage from '@/renderer/components/LoginPage.vue'
 import { onMounted, computed } from 'vue'

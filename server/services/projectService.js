@@ -45,6 +45,8 @@ class ProjectService {
     }
   }
   async sendToRevibed(source) {
+    console.log('sendToRevibed source', source)
+    const { owner, condition, quality } = source;
     const project = {
       title: this.releaseData.title,
       artist: this.releaseData.artist,
@@ -52,7 +54,9 @@ class ProjectService {
       labelID: this.releaseData.labelID,
       labelName: this.releaseData.label,
       tracklist: this.releaseData.tracklist,
-      source: source,
+      source: owner,
+      sourceCondition: condition,
+      quality: quality,
       updated: Date.now()
     }
     const headers = {
@@ -60,6 +64,7 @@ class ProjectService {
       accept: 'application/json',
       'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
     }
+    console.log('sendToRevibed project', project)
     try {
       const response = await axios.post(`http://labels.kx-streams.com/api/add-release`, project, {
         headers: headers

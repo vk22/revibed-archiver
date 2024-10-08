@@ -659,7 +659,7 @@ class FilesService {
     console.log('filesHandler Done')
     return { folderMAIN, allFilesList }
   }
-  async archiveProject(source) {
+  async archiveProject() {
     /// get releaseID from ProjectService
     const releaseID = ProjectService.releaseID
     console.log('archiveProject releaseID ', releaseID)
@@ -685,20 +685,14 @@ class FilesService {
     }
 
     let result = {
-      archiver: {
-        success: true,
-        message: 'Project has been archived'
-      }
+      success: true,
+      message: 'Project has been archived'
     }
 
     // if (this.folderSPECTRO) {
     //   await fs.rmSync(this.folderSPECTRO, { recursive: true, force: true })
     // }
 
-    ///// Save To Revibed
-    const sendProjectToRevibed = await ProjectService.sendToRevibed(source)
-    console.log('sendProjectToRevibed ', sendProjectToRevibed)
-    result.revibed = sendProjectToRevibed
     return result
   }
 
