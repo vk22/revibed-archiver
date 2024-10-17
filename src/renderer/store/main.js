@@ -44,7 +44,7 @@ export const useMainStore = defineStore('main', {
       restoredFilesList: [],
       updated: {},
       errors: [],
-      noFiles: false,
+      noFiles: false
     },
     sourceData: {
       owner: undefined,
@@ -118,12 +118,15 @@ export const useMainStore = defineStore('main', {
       return response
     },
     async checkRelease(releaseID) {
-      const response = await axios.post(`${API_URL_LABELS}/check-release`,
-        { releaseID: releaseID }, {
-        headers: {
-          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+      const response = await axios.post(
+        `${API_URL_LABELS}/check-release`,
+        { releaseID: releaseID },
+        {
+          headers: {
+            'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+          }
         }
-      })
+      )
       return response
     },
     async getServerData() {
@@ -250,9 +253,8 @@ export const useMainStore = defineStore('main', {
       this.folderFilesReady = true
     },
     setSourceData(key, value) {
-      this.sourceData[key] = value;
+      this.sourceData[key] = value
       console.log('this.sourceData[key] ', this.sourceData[key])
-
     },
     async getFilesFromFolder() {
       this.setLoading({ state: true })
@@ -336,7 +338,9 @@ export const useMainStore = defineStore('main', {
     async archiveProject() {
       this.setLoading({ state: true })
       console.log('this.sourceData ', this.sourceData)
-      const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, { source: this.sourceData })
+      const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, {
+        source: this.sourceData
+      })
       console.log('archiveProject ', data)
       if (data.success) {
         this.setLoading({ state: false, finish: true })
@@ -369,28 +373,7 @@ export const useMainStore = defineStore('main', {
     },
     clearState() {
       console.log('clearState')
-      this.allDataInStore.value = false
-      this.restoredFilesList = []
-      this.filesPath = undefined
-      this.folderPath = undefined
-      this.folderDroppedData = []
-      this.folderDropped = false
-      this.folderFilesReady = false
-      this.loading = false
-      this.playerIsActive = false
-      this.selectedTrack = null
-      this.mainImage = {
-        filename: undefined,
-        filepath: undefined
-      }
-      this.rip = {}
-      this.canSave = false
-      this.discogsLinkTemp = undefined
-      this.discogsRequest = false
-      this.dialog = false
-      this.globalErrors = undefined
-      this.discogsImages = undefined
-      this.matchType = 'match-by-position'
+      this.$reset()
     },
     ///// Filter
     setFilteredState(data) {

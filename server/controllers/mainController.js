@@ -1,18 +1,17 @@
-const ProjectService = require("../services/projectService");
-const DiscogsService = require("../services/discogsService");
-const FilesService = require("../services/filesService");
-const ExportService = require("../services/exportService");
-const ErrorsService = require("../services/errorsService");
-const UserService = require("../services/userService");
-
+const ProjectService = require('../services/projectService')
+const DiscogsService = require('../services/discogsService')
+const FilesService = require('../services/filesService')
+const ExportService = require('../services/exportService')
+const ErrorsService = require('../services/errorsService')
+const UserService = require('../services/userService')
 
 class MainController {
   async checkDropedFolder(req, res) {
     try {
       console.log('checkDropedFolder')
-      const folder = req.body.folder;
-      FilesService.setInitialData(folder);
-      const folderFiles = await FilesService.parseFiles(folder, true);
+      const folder = req.body.folder
+      FilesService.setInitialData(folder)
+      const folderFiles = await FilesService.parseFiles(folder, true)
       const errors = ErrorsService.getAll()
       ErrorsService.clear()
       res.json({
@@ -20,7 +19,6 @@ class MainController {
         files: folderFiles,
         errors: errors
       })
-
     } catch (e) {
       console.log('eee ', e)
       res.status(500).json(e)
@@ -28,7 +26,7 @@ class MainController {
   }
   async getFilesFromFolder(req, res) {
     try {
-      const folderFiles = await FilesService.getFilesFromFolder();
+      const folderFiles = await FilesService.getFilesFromFolder()
       res.json({
         success: true,
         files: folderFiles
@@ -52,7 +50,6 @@ class MainController {
     } catch (e) {
       res.status(500).json(e)
     }
-
   }
   async downloadDiscogsImages(req, res) {
     try {
@@ -66,24 +63,23 @@ class MainController {
     } catch (e) {
       res.status(500).json(e)
     }
-
   }
   async editImage(req, res) {
     try {
-      const oldPath = req.body.oldPath;
-      const newPath = req.body.newPath;
-      const imageSize = req.body.imageSize ? +req.body.imageSize.split('x')[0] : 0;
+      const oldPath = req.body.oldPath
+      const newPath = req.body.newPath
+      const imageSize = req.body.imageSize ? +req.body.imageSize.split('x')[0] : 0
       const result = await FilesService.convertImage(oldPath, newPath, imageSize)
-      res.send(result);
+      res.send(result)
     } catch (e) {
       res.status(500).json(e)
     }
   }
   async deleteFile(req, res) {
     try {
-      const filename = req.body.filename;
-      const result = await FilesService.deleteFile(filename);
-      res.send(result);
+      const filename = req.body.filename
+      const result = await FilesService.deleteFile(filename)
+      res.send(result)
     } catch (err) {
       res.status(500).json(e)
     }
@@ -101,7 +97,6 @@ class MainController {
     } catch (e) {
       res.status(500).json(e)
     }
-
   }
   async archiveProject(req, res) {
     try {
@@ -111,9 +106,9 @@ class MainController {
         archiver: undefined,
         revibed: undefined
       }
-      const responseArchiver = await FilesService.archiveProject();
+      const responseArchiver = await FilesService.archiveProject()
       console.log('responseArchiver ', responseArchiver)
-      result.archiver = responseArchiver;
+      result.archiver = responseArchiver
 
       if (responseArchiver.success) {
         ///// Save To Revibed
@@ -123,7 +118,7 @@ class MainController {
       }
       res.json({
         success: true,
-        result: result,
+        result: result
       })
     } catch (e) {
       console.log('archiveProject error ', e)
@@ -132,25 +127,26 @@ class MainController {
   }
   async getReleaseForYoutube(req, res) {
     const releases = req.body.releases
-    const result = await ExportService.sendReleasesToYoutube(releases)
+    const userFolders = await UserService.getUserData()
+    const result = await ExportService.sendReleasesToYoutube(releases, userFolders)
     res.json(result)
   }
   async getReleaseForRVBD(req, res) {
     const releases = req.body.releases
-    const userFolders = await UserService.getUserData();
+    const userFolders = await UserService.getUserData()
     const result = await ExportService.getReleaseForRVBD(releases, userFolders)
     res.json(result)
   }
   async updateRevibedDB(req, res) {
     const releases = req.body.releases
-    const userFolders = await UserService.getUserData();
+    const userFolders = await UserService.getUserData()
     const result = await ExportService.updateRevibedDB(releases, userFolders)
     res.json(result)
   }
   async setUserLocalData(req, res) {
-    const data = req.body.data;
+    const data = req.body.data
     console.log('setUserLocalData ', data)
-    const setData = await UserService.setUserData(data);
+    const setData = await UserService.setUserData(data)
     if (setData.success) {
       res.json({
         success: true
@@ -158,14 +154,13 @@ class MainController {
     }
   }
   async getUserLocalData(req, res) {
-    const data = await UserService.getUserData();
+    const data = await UserService.getUserData()
     if (data) {
       res.json(data)
     } else {
       res.status(500).json(e)
     }
   }
-
 }
 
-module.exports = new MainController();
+module.exports = new MainController()

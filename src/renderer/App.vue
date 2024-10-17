@@ -16,11 +16,12 @@
             <div class="left">
               <router-link class="link" :to="{ name: 'NewProject' }">Add new</router-link>
               <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link>
-
             </div>
             <div class="right">
               <!-- <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link> -->
-              <router-link class="link" :to="{ name: 'User' }" v-if="user">{{ user.username }}</router-link>
+              <router-link class="link" :to="{ name: 'User' }" v-if="user">{{
+                user.username
+              }}</router-link>
               <!-- <div class="userkey" v-on:click="userLogout()" v-if="user">{{ user }}</div> -->
             </div>
           </div>
@@ -51,7 +52,6 @@ onMounted(() => {
   store.getServerData()
 })
 </script>
-
 
 <!-- <template>
   <DefaultLayout>

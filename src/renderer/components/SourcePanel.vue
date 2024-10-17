@@ -3,22 +3,36 @@
     <div class="l-col">
       <div class="select-wrap">
         <label>Owners</label>
-        <v-select :items="ownersList" v-model="ownersSelected" variant="outlined" density="compact"
-          @update:modelValue="setSourceDataToStore('owner', ownersSelected)"></v-select>
+        <v-select
+          :items="ownersList"
+          v-model="ownersSelected"
+          variant="outlined"
+          density="compact"
+          @update:modelValue="setSourceDataToStore('owner', ownersSelected)"
+        ></v-select>
       </div>
       <div class="select-wrap">
         <label>Media Condition</label>
-        <v-select :items="conditionsList" v-model="conditionsSelected" variant="outlined" density="compact"
-          @update:modelValue="setSourceDataToStore('condition', conditionsSelected)"></v-select>
+        <v-select
+          :items="conditionsList"
+          v-model="conditionsSelected"
+          variant="outlined"
+          density="compact"
+          @update:modelValue="setSourceDataToStore('condition', conditionsSelected)"
+        ></v-select>
       </div>
       <div class="select-wrap">
         <label>Rip Quality</label>
-        <v-select :items="qualityList" v-model="qualitySelected" variant="outlined" density="compact"
-          @update:modelValue="setSourceDataToStore('quality', qualitySelected)"></v-select>
+        <v-select
+          :items="qualityList"
+          v-model="qualitySelected"
+          variant="outlined"
+          density="compact"
+          @update:modelValue="setSourceDataToStore('quality', qualitySelected)"
+        ></v-select>
       </div>
     </div>
-    <div class="r-col">
-    </div>
+    <div class="r-col"> </div>
   </div>
 </template>
 
@@ -27,7 +41,8 @@ import { ref } from 'vue'
 import SpectroIcon from './SpectroIcon.vue'
 
 // import LoginPage from '@/renderer/components/LoginPage.vue'
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
+import { watchEffect } from '@vue/runtime-core'
 import { useMainStore } from '@/renderer/store/main'
 const store = useMainStore()
 
@@ -42,19 +57,27 @@ const canSave = computed(() => {
 })
 
 /// data
-let isRework = ref(null)
-let discogsLinkTemp = ref(undefined)
-let matchType = true
 let ownersList = ['Anton', 'Revibed', 'KX Balance', 'KX']
-let ownersSelected = ref(null)
+let ownersSelected = ref('')
 let conditionsList = ['M', 'NM', 'VG+', 'VG', 'G+', 'G', 'F', 'P']
-let conditionsSelected = ref(null)
+let conditionsSelected = ref('')
 let qualityList = ['HI', 'LOW']
-let qualitySelected = ref(null)
+let qualitySelected = ref('')
 
-// const ownersSelected = computed(() => {
-//   return store.sourceData
-// })
+function clearAllSelect() {
+  ownersSelected.value = ''
+  conditionsSelected.value = ''
+  qualitySelected.value = ''
+}
+
+watchEffect(() => {
+  // pretend you have a getData getter in store
+  const data = store.getFolderDroppedState
+  if (!data) {
+    clearAllSelect()
+  }
+  console.log(data)
+})
 
 /// Methods
 
@@ -62,81 +85,8 @@ function setSourceDataToStore(key, value) {
   // console.log('key, value ', key, value)
   store.setSourceData(key, value)
 }
-function parseDiscogsLink() {
-  const arr = discogsLinkTemp.value.split('/')
-  const releaseIndex = arr.indexOf('release')
-  if (releaseIndex < 0) {
-    console.log('Incorrect link')
-    alert('Incorrect link')
-  } else {
-    const idIndex = releaseIndex + 1
-    const id = arr[idIndex].split('-')[0]
-    return id
-  }
-}
-async function parseDiscogs() {
-  store.setLoading({ state: true })
-  if (!discogsLinkTemp.value) return
-  const releaseID = parseDiscogsLink()
-  if (!releaseID) return
-  /// Проверка на лейбл
-  const checkReleaseBefore = await store.checkRelease(releaseID)
-  console.log('checkReleaseBefore ', checkReleaseBefore)
-  let checkReleaseBeforeHandledArr = Object.values(checkReleaseBefore.data.data)
-  let checkReleaseBeforeHandled = checkReleaseBeforeHandledArr.some(item => item === 'warning' || item === 'blocked')
-  if (checkReleaseBeforeHandled) {
-    alert(JSON.stringify('Dangerous label!'))
-  }
-  /// Проверка на релиз
-  const checkRelease = store.getIfprojectExists(releaseID)
-  console.log('checkRelease ', checkRelease)
-  console.log('isRework ', isRework.value)
-  if (checkRelease.exist) {
-    // release exit
-    if (checkRelease.type === 'preorder' || checkRelease.type === 'allowed_to_buy') {
-      alert('This is ' + checkRelease.type)
-    } else {
-      if (!isRework.value) {
-        alert('This release already has been done!')
-        store.setLoading({ state: false })
-        return
-      }
-    }
-  }
-  // if (checkRelease && !isRework.value) {
-  //   alert('This release already has been done!')
-  //   store.setLoading({ state: false })
-  //   return
-  // }
-  ///
-  store.parseDiscogs(releaseID)
-}
-function checkFiles() {
-  store.checkFiles()
-}
-function saveDiscogsTags() {
-  store.setDiscogsTags()
-}
-function clearState() {
-  discogsLinkTemp.value = undefined
-  // store.clearState()
-  store.$reset()
-}
-function archiveProject() {
-  store.archiveProject({ source: this.sourceSelected })
-}
-function setMatchType(event) {
-  console.log('setMatchType ', event.target.checked)
-  let type = event.target.checked ? 'match-by-position' : 'match-by-title'
-  store.setMatchType(type)
-}
-function setDiscogsSubtracksStage(event) {
-  console.log('setDiscogsSubtracksStage ', event.target.checked)
-  let type = event.target.checked
-  store.setDiscogsSubtracksStage(type)
-}
 
-onMounted(() => { })
+onMounted(() => {})
 </script>
 
 <style lang="scss">
@@ -163,7 +113,7 @@ onMounted(() => { })
   }
 
   .l-col {
-    &>div {
+    & > div {
       margin-right: 0.5rem;
     }
   }

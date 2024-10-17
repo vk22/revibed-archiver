@@ -1,9 +1,12 @@
-import { app, WebContents, RenderProcessGoneDetails } from 'electron'
+import { app, WebContents, RenderProcessGoneDetails, utilityProcess } from 'electron'
 import Constants from './utils/Constants'
 import { createErrorWindow, createMainWindow } from './MainRunner'
 
 let mainWindow
 let errorWindow
+
+
+require('../../server/index')
 
 app.on('ready', async () => {
   if (Constants.IS_DEV_ENV) {
@@ -33,7 +36,7 @@ app.on('window-all-closed', () => {
 
   if (!Constants.IS_MAC) {
     app.quit()
-  }
+  } 
 })
 
 app.on(
@@ -47,4 +50,4 @@ process.on('uncaughtException', () => {
   errorWindow = createErrorWindow(errorWindow, mainWindow)
 })
 
-require('../../server/index')
+

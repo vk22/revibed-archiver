@@ -1,12 +1,10 @@
 import auth from '@/renderer/middleware/auth'
-import { MainScreen } from '@/renderer/screens'
 import NewProject from '@/renderer/pages/NewProject'
 import RipsList from '@/renderer/pages/RipsList'
 import Login from '@/renderer/pages/Login'
 import User from '@/renderer/pages/User'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useUserStore } from '@/renderer/store/user'
-
 
 const routes = [
   {
@@ -35,7 +33,7 @@ const routes = [
     name: 'User',
     component: User,
     meta: { requiresAuth: true, middleware: auth }
-  },
+  }
   // {
   //   path: '/second',
   //   component: () => import('@/renderer/screens/SecondScreen.vue'),
@@ -60,16 +58,15 @@ const router = createRouter({
   routes
 })
 
-
 router.beforeEach(async (to, from) => {
   // console.log('beforeEach ', store.state.auth.status)
-  const authStore = useUserStore();
+  const authStore = useUserStore()
   let isAuthenticated = authStore.user.loggedIn
   console.log('isAuthenticated ', isAuthenticated, to)
   if (!isAuthenticated && to.name !== 'Login') {
     // redirect the user to the login page
     return { name: 'Login' }
-  } 
+  }
 })
 
 export default router

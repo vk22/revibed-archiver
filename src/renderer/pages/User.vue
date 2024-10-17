@@ -1,17 +1,26 @@
 <template>
   <section class="user-page">
-
     <div class="user-container">
       <div class="username mt-2 mb-3">
         <h1>{{ user.username }}</h1>
       </div>
       <div class="field">
         <label>Music Storage</label>
-        <input class="input" v-model="localFolders.storageFolder" type="text" :placeholder="'Path to local folder'" />
+        <input
+          class="input"
+          v-model="localFolders.storageFolder"
+          type="text"
+          :placeholder="'Path to local folder'"
+        />
       </div>
       <div class="field">
         <label>Export Folder</label>
-        <input class="input" v-model="localFolders.exportFolder" type="text" :placeholder="'Path to local folder'" />
+        <input
+          class="input"
+          v-model="localFolders.exportFolder"
+          type="text"
+          :placeholder="'Path to local folder'"
+        />
       </div>
       <!-- <div class="userrole">manager</div> -->
       <div class="mt-2 mb-3">
@@ -20,12 +29,8 @@
       <div class="">
         <button class="btn" @click="logout()">Logout</button>
       </div>
-
     </div>
-
-
   </section>
-
 </template>
 
 <script setup>
@@ -35,9 +40,9 @@ import { useUserStore } from '@/renderer/store/user'
 const authStore = useUserStore()
 const user = computed(() => {
   return authStore.user
-});
+})
 
-(async () => {
+;(async () => {
   await authStore.getUserLocalData()
 })()
 
@@ -55,7 +60,6 @@ const save = () => {
   console.log('localFolders ', localFolders.value)
   authStore.setUserLocalData(localFolders.value)
 }
-
 </script>
 
 <style lang="scss">
@@ -76,7 +80,7 @@ const save = () => {
       display: block;
       font-size: 0.85rem;
       font-weight: 600;
-      margin: .15rem 0;
+      margin: 0.15rem 0;
     }
 
     input {
@@ -90,7 +94,7 @@ const save = () => {
       border: 1px solid #999;
       //border-bottom: 1px solid #909090;
       box-shadow: none;
-      padding: .35rem .5rem;
+      padding: 0.35rem 0.5rem;
       border-radius: 4px;
       width: 100%;
       max-width: 100%;
@@ -100,15 +104,13 @@ const save = () => {
       //   padding: 1rem 0.75rem;
       // }
       &::placeholder {
-        font-size: .95rem;
+        font-size: 0.95rem;
       }
 
       &:focus {
         outline: none;
       }
     }
-
-
 
     .field {
       width: 100%;

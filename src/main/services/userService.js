@@ -1,4 +1,4 @@
-const UserLocalData = require('../services/userLocalData')
+const UserLocalData = import('../services/userLocalData')
 
 class UserService {
   constructor() { }

@@ -10,10 +10,14 @@
         <input type="text" v-model="discogsLinkTemp" placeholder="Discogs Link" />
       </div>
       <div class="btn-wrap">
-        <button class="btn" @click="parseDiscogs()" :class="{ disable: !discogsLinkTemp }">Discogs</button>
+        <button class="btn" @click="parseDiscogs()" :class="{ disable: !discogsLinkTemp }"
+          >Discogs</button
+        >
       </div>
       <div class="btn-wrap">
-        <button class="btn main" @click="saveDiscogsTags()" :class="{ disable: !discogsRequest }">Add Tags</button>
+        <button class="btn main" @click="saveDiscogsTags()" :class="{ disable: !discogsRequest }"
+          >Add Tags</button
+        >
       </div>
       <div class="checkbox-wrap">
         <input type="checkbox" id="matchType" v-model="matchType" @change="setMatchType($event)" />
@@ -31,7 +35,9 @@
     <div class="r-col">
       <!-- <v-checkbox color="dark" class="mt-0" v-model="rip.needFLAC" label="FLAC" /> -->
       <button class="btn" @click="clearState"><v-icon>mdi-delete</v-icon></button>
-      <button class="btn save" :class="{ disable: !canSave }" @click="archiveProject()">Archive</button>
+      <button class="btn save" :class="{ disable: !canSave }" @click="archiveProject()"
+        >Archive</button
+      >
     </div>
   </div>
 </template>
@@ -85,7 +91,9 @@ async function parseDiscogs() {
   const checkReleaseBefore = await store.checkRelease(releaseID)
   console.log('checkReleaseBefore ', checkReleaseBefore)
   let checkReleaseBeforeHandledArr = Object.values(checkReleaseBefore.data.data)
-  let checkReleaseBeforeHandled = checkReleaseBeforeHandledArr.some(item => item === 'warning' || item === 'blocked')
+  let checkReleaseBeforeHandled = checkReleaseBeforeHandledArr.some(
+    (item) => item === 'warning' || item === 'blocked'
+  )
   if (checkReleaseBeforeHandled) {
     alert(JSON.stringify('Dangerous label!'))
   }
@@ -121,7 +129,7 @@ function saveDiscogsTags() {
 }
 function clearState() {
   discogsLinkTemp.value = undefined
-  // store.clearState()
+  store.clearState()
   store.$reset()
   // document.location.reload()
 }
@@ -139,7 +147,7 @@ function setDiscogsSubtracksStage(event) {
   store.setDiscogsSubtracksStage(type)
 }
 
-onMounted(() => { })
+onMounted(() => {})
 </script>
 
 <style lang="scss">
@@ -166,7 +174,7 @@ onMounted(() => { })
   }
 
   .l-col {
-    &>div {
+    & > div {
       margin-right: 0.5rem;
     }
   }

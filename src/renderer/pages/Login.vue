@@ -3,10 +3,22 @@
     <div>
       <div class="login-form">
         <div class="field">
-          <input class="input" id="username" v-model="user.username" type="text" :placeholder="'Username'" />
+          <input
+            class="input"
+            id="username"
+            v-model="user.username"
+            type="text"
+            :placeholder="'Username'"
+          />
         </div>
         <div class="field">
-          <input class="input" id="pw" v-model="user.password" type="password" :placeholder="'Password'" />
+          <input
+            class="input"
+            id="pw"
+            v-model="user.password"
+            type="password"
+            :placeholder="'Password'"
+          />
         </div>
         <div class="field">
           <button @click="login" class="main-btn">Login</button>
@@ -17,7 +29,6 @@
       </div>
     </div>
   </section>
-
 </template>
 
 <script setup>
@@ -30,25 +41,23 @@ const user = ref({
   username: '',
   password: ''
 })
-const loading = ref(false);
-const message = ref('');
+const loading = ref(false)
+const message = ref('')
 
 function login() {
   console.log('user ', user.value)
-  loading.value = true;
+  loading.value = true
 
   authStore.login(user.value).then(
     () => {
-      router.push("/");
+      router.push('/')
     },
     (error) => {
-      loading.value = false;
+      loading.value = false
       message.value =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
+        (error.response && error.response.data && error.response.data.message) ||
         error.message ||
-        error.toString();
+        error.toString()
     }
   )
 }

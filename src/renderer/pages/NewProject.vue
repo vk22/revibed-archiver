@@ -74,16 +74,24 @@
     <div class="folder-container" v-if="folderFilesReady">
       <div class="folder-files" v-if="folderFiles.files.length">
         <!-- <div class="folder-files__title">FILES</div> -->
-        <v-data-table :headers="headers" :items="folderFiles.files" :single-select="true" density="compact"
-          :hide-default-footer="true">
+        <v-data-table
+          :headers="headers"
+          :items="folderFiles.files"
+          :single-select="true"
+          density="compact"
+          :hide-default-footer="true"
+        >
           <template v-slot:header="{ props }">
             <th v-for="head in props.headers" :key="head">{{ head.text }}</th>
           </template>
           <template v-slot:item="{ item }">
-            <tr :class="{
-              active: item.filename === selectedTrack.filename,
-              'has-error': item.errors.length
-            }" @click="selectRow(item)">
+            <tr
+              :class="{
+                active: item.filename === selectedTrack.filename,
+                'has-error': item.errors.length
+              }"
+              @click="selectRow(item)"
+            >
               <td>{{ item.filename }}</td>
               <td>{{ item.metadata.title }}</td>
               <td>
@@ -209,7 +217,6 @@ function debounce(callee, timeoutMs) {
     let lastCallTimer = setTimeout(() => callee(...args), timeoutMs)
   }
 }
-
 
 onMounted(() => {
   window.addEventListener('drop', (event) => {
@@ -404,7 +411,10 @@ legend {
   color: green;
 }
 
-.theme--light.v-text-field--outlined:not(.v-input--is-focused):not(.v-input--has-state)>.v-input__control>.v-input__slot fieldset {
+.theme--light.v-text-field--outlined:not(.v-input--is-focused):not(.v-input--has-state)
+  > .v-input__control
+  > .v-input__slot
+  fieldset {
   color: rgb(0 0 0 / 15%) !important;
 }
 </style>

@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const MainController = require('../controllers/mainController')
+const MainController = import('../controllers/mainController')
 // const DiscogsController = require('../controllers/discogsController')
 // const exportController = require('../controllers/exportController')
 

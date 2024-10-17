@@ -41,11 +41,7 @@ export default {
   },
   computed: {
     selected() {
-      return this.default
-        ? this.default
-        : this.options.length > 0
-        ? this.options[0]
-        : null
+      return this.default ? this.default : this.options.length > 0 ? this.options[0] : null
     }
   },
   mounted() {

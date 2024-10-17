@@ -16,14 +16,14 @@ declare global {
 const app = createApp(App)
 
 app.config.globalProperties.$filters = {
-  minutes(value) {
+  minutes(value: number) {
     if (!value || typeof value !== 'number') return '00:00'
-    let min = parseInt(value / 60)
-    let sec = parseInt(value % 60)
-    min = min < 10 ? '0' + min : min
-    sec = sec < 10 ? '0' + sec : sec
-    value = min + ':' + sec
-    return value
+    let min = value / 60
+    let sec = value % 60
+    let min_str = min < 10 ? '0' + min : min
+    let sec_str = sec < 10 ? '0' + sec : sec
+    let value_str = min_str + ':' + sec_str
+    return value_str
   }
 }
 
