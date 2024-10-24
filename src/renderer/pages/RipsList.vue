@@ -4,15 +4,10 @@
       <v-row>
         <v-col>
           <FilterReleases></FilterReleases>
-          <button class="btn mr-2" @click="addToRVBD()" :class="{ disable: selected.length === 0 }"
-            >Add to Revibed</button
-          >
-          <button
-            class="btn mr-2"
-            @click="addToYoutube()"
-            :class="{ disable: selected.length === 0 }"
-            >Add to Youtube</button
-          >
+          <button class="btn mr-2" @click="addToRVBD()" :class="{ disable: selected.length === 0 }">Add to
+            Revibed</button>
+          <button class="btn mr-2" @click="addToYoutube()" :class="{ disable: selected.length === 0 }">Add to
+            Youtube</button>
         </v-col>
         <v-col class="d-flex align-center">
           <div class="stats-block">
@@ -32,35 +27,21 @@
         </v-col>
       </v-row>
     </div>
-    <v-row
-      v-if="Object.keys(ripsList).length"
-      class="releases-list"
-      ref="rips"
-      v-on:scroll="handleScroll()"
-    >
+    <v-row v-if="Object.keys(ripsList).length" class="releases-list" ref="rips" v-on:scroll="handleScroll()">
       <v-col md="12">
-        <v-data-table
-          v-model="selected"
-          :headers="headers"
-          :items="ripsList"
-          :single-select="true"
-          density="compact"
-          :hide-default-footer="true"
-          show-select
-          item-value="_id"
-          items-per-page="200"
-        >
+        <div class="search-container">
+          <v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" single-line variant="outlined"
+            hide-details density="compact"></v-text-field>
+        </div>
+
+        <v-data-table v-model="selected" :headers="headers" :items="ripsList" :search="search" :single-select="true"
+          density="compact" :hide-default-footer="true" show-select item-value="_id" items-per-page="200">
           <template v-slot:item.updated="{ item }">
             {{ formatDateEn(item.updated) }}
           </template>
           <template v-slot:item.onRevibed="{ item }">
-            <a
-              :href="` https://revibed.com/marketplace/${item.onRevibed.id}`"
-              class="table-item__youtubeLink"
-              v-if="item.onRevibed.forSale"
-              target="_blank"
-              >{{ item.onRevibed.id }}</a
-            >
+            <a :href="` https://revibed.com/marketplace/${item.onRevibed.id}`" class="table-item__youtubeLink"
+              v-if="item.onRevibed.forSale" target="_blank">{{ item.onRevibed.id }}</a>
             <span v-else class="grey">
               {{ item.onRevibed.id }}
             </span>
@@ -112,6 +93,7 @@ const ripsList = computed(() => {
 })
 
 const selected = ref([])
+const search = ref('')
 watch(selected, (newValue, oldValue) => {
   console.log(`watch: selected changed from ${oldValue} to ${newValue}`)
 })
@@ -174,7 +156,7 @@ const headers = ref([
   // { text: "Errors", value: "errors", sortable: false },
 ])
 
-onMounted(() => {})
+onMounted(() => { })
 </script>
 
 <style lang="scss">
@@ -188,11 +170,17 @@ onMounted(() => {})
   padding: 1rem;
   border-bottom: 1px solid #ddd;
 }
+
+.search-container {
+  padding: 1rem;
+}
+
 table thead {
   // background: $color_black;
   color: #777;
   font-weight: 700;
 }
+
 .stats-block {
   text-align: right;
   width: 100%;
@@ -208,6 +196,7 @@ table thead {
     display: inline-block;
   }
 }
+
 .grey {
   color: #c1c1c1;
 }

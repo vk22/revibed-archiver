@@ -1,33 +1,26 @@
 <template>
   <section class="user-page">
     <div class="user-container">
-      <div class="username mt-2 mb-3">
-        <h1>{{ user.username }}</h1>
+      <div class="user">
+        <div class="avatar">
+          <v-avatar color="#ddd" size="x-large"></v-avatar>
+        </div>
+        <div class="username">{{ user.username }}</div>
       </div>
       <div class="field">
         <label>Music Storage</label>
-        <input
-          class="input"
-          v-model="localFolders.storageFolder"
-          type="text"
-          :placeholder="'Path to local folder'"
-        />
+        <input class="input" v-model="localFolders.storageFolder" type="text" :placeholder="'Path to local folder'" />
       </div>
       <div class="field">
         <label>Export Folder</label>
-        <input
-          class="input"
-          v-model="localFolders.exportFolder"
-          type="text"
-          :placeholder="'Path to local folder'"
-        />
+        <input class="input" v-model="localFolders.exportFolder" type="text" :placeholder="'Path to local folder'" />
       </div>
       <!-- <div class="userrole">manager</div> -->
       <div class="mt-2 mb-3">
         <button class="btn main" @click="save()">Save</button>
       </div>
       <div class="">
-        <button class="btn" @click="logout()">Logout</button>
+        <button class="btn outline" @click="logout()">Logout</button>
       </div>
     </div>
   </section>
@@ -42,9 +35,9 @@ const user = computed(() => {
   return authStore.user
 })
 
-;(async () => {
-  await authStore.getUserLocalData()
-})()
+  ; (async () => {
+    await authStore.getUserLocalData()
+  })()
 
 const localFolders = computed(() => {
   if (authStore.localFolders) {
@@ -74,14 +67,32 @@ const save = () => {
 
 .user-page {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   text-align: center;
+  padding: 2rem;
   min-height: calc(100vh - 50px);
 
   .user-container {
     width: 350px;
     text-align: left;
+
+    .user {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .avatar {
+      margin-right: .75rem;
+    }
+
+    .username {
+      font-size: 1.5rem;
+      line-height: 1.5rem;
+    }
 
     label {
       display: block;
@@ -105,7 +116,7 @@ const save = () => {
       border-radius: 4px;
       width: 100%;
       max-width: 100%;
-      font-size: 1rem;
+      font-size: .85rem;
 
       // @include for-700-height-only {
       //   padding: 1rem 0.75rem;

@@ -1,6 +1,31 @@
-import { app, WebContents, RenderProcessGoneDetails, utilityProcess } from 'electron'
+import { app, WebContents, RenderProcessGoneDetails, utilityProcess, Menu, MenuItem, shell } from 'electron'
 import Constants from './utils/Constants'
 import { createErrorWindow, createMainWindow } from './MainRunner'
+import contextMenu from 'electron-context-menu';
+import MainController from './mainController.js'
+
+contextMenu({
+	prepend: (defaultActions, parameters, browserWindow) => [
+		{
+			label: 'Rainbow',
+			// Only show it when right-clicking images
+			visible: parameters.mediaType === 'image'
+		},
+		{
+			label: 'Show in Finder for “{selection}”',
+			// Only show it when right-clicking text
+			//visible: parameters.selectionText.trim().length > 0,
+      visible: true,
+			click: async () => {
+        console.log(parameters)
+        const userLocalFolders = await MainController.getUserLocalData()
+        const path = `${userLocalFolders.storageFolder}/${parameters.selectionText}`
+        shell.openPath(path)
+				// shell.openExternal(`https://google.com/search?q=${encodeURIComponent(parameters.selectionText)}`);
+			}
+		}
+	]
+});
 
 let mainWindow
 let errorWindow
@@ -21,6 +46,8 @@ app.on('ready', async () => {
   */
 
   mainWindow = await createMainWindow(mainWindow)
+
+
 })
 
 app.on('activate', async () => {
