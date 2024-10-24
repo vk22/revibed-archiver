@@ -3,7 +3,10 @@
     <div class="user-container">
       <div class="user">
         <div class="avatar">
-          <v-avatar color="#ddd" size="x-large"></v-avatar>
+          <v-avatar size="x-large">
+            <v-img alt="John"
+              src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFroBand&accessoriesType=Wayfarers&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=Hoodie&clotheColor=Black&graphicType=Resist&eyeType=Cry&eyebrowType=RaisedExcitedNatural&mouthType=Serious&skinColor=DarkBrown"></v-img>
+          </v-avatar>
         </div>
         <div class="username">{{ user.username }}</div>
       </div>
