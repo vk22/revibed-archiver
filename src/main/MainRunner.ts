@@ -1,6 +1,9 @@
-import { app, BrowserWindow, RenderProcessGoneDetails } from 'electron'
+import { app, BrowserWindow, RenderProcessGoneDetails, ipcMain } from 'electron'
 import Constants from './utils/Constants'
 import IPCs from './IPCs'
+//import MainController from './mainController.js'
+import { mainClass, cube, foo } from './my-module.js'
+import MainController from './mainController.js'
 
 const exitApp = (mainWindow: BrowserWindow): void => {
   if (mainWindow && !mainWindow.isDestroyed()) {

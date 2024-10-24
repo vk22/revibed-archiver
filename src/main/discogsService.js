@@ -3,8 +3,8 @@ const db = new Discogs({
   consumerKey: 'EZWmCxdwZuUQCTmUbfRY',
   consumerSecret: 'tyoPkXCrZTCqIlFDaVIWeZkwTeMaCbSm'
 }).database()
-const FilesService = require('../services/filesService')
-const ProjectService = require('../services/projectService')
+import FilesService from './filesService.js'
+import ProjectService from './projectService.js'
 
 class DiscogsService {
   ///
@@ -174,7 +174,7 @@ class DiscogsService {
       discogsReleaseData.formats !== undefined ? discogsReleaseData.formats[0].name : ''
     const formatDescription =
       discogsReleaseData.formats !== undefined &&
-        discogsReleaseData.formats[0].descriptions != undefined
+      discogsReleaseData.formats[0].descriptions != undefined
         ? discogsReleaseData.formats[0].descriptions[0]
         : ''
 
@@ -249,4 +249,4 @@ class DiscogsService {
   }
 }
 
-module.exports = new DiscogsService()
+export default new DiscogsService()

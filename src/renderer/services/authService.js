@@ -2,7 +2,7 @@ import axios from 'axios'
 
 //const API_URL_LABELS = 'http://localhost:3000/auth'
 const API_URL_LABELS = 'http://labels.kx-streams.com/api/auth/'
-const API_URL = 'http://localhost:8000/api'
+// const API_URL = 'http://localhost:8000/api'
 //const API_URL = 'http://labels.kx-streams.com/api/auth/'
 
 class AuthService {
@@ -49,21 +49,19 @@ class AuthService {
   }
 
   getUserLocalData() {
-    return axios.get(API_URL + '/user/get-local-data').then((response) => {
-      if (response.data) {
-        console.log('qwqwqwq ', response.data)
-        localStorage.setItem('storageFolder', JSON.stringify(response.data.storageFolder))
-        localStorage.setItem('exportFolder', JSON.stringify(response.data.exportFolder))
-      }
-      return response.data
+    return new Promise((resolve, reject) => {
+      window.mainApi.invoke('getUserLocalData').then((result) => {
+        resolve(result)
+      })
     })
   }
-  // async getUserLocalData() {
-  //   return axios.get(API_URL + '/user/get-local-data');
-  // }
   setUserLocalData(data) {
-    return axios.post(API_URL + '/user/set-local-data', {
-      data: data
+    const dataParsed = JSON.parse(JSON.stringify(data))
+    return new Promise((resolve, reject) => {
+      window.mainApi.invoke('setUserLocalData', dataParsed).then((result) => {
+        console.log('AuthService result ', result)
+        resolve(result)
+      })
     })
   }
 }

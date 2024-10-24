@@ -41,11 +41,12 @@ const selectedTrack = computed(() => {
 })
 
 async function editTrack() {
-  const response = await this.$axios.post('http://localhost:8000/api/set-metadata-one-track', {
-    metadata: selectedTrack.metadata,
-    filepath: selectedTrack.filepath
-  })
-  console.log('delete response ', response)
+  store.setTrackID3Tags(selectedTrack.value)
+  // const response = await this.$axios.post('http://localhost:8000/api/set-metadata-one-track', {
+  //   metadata: selectedTrack.metadata,
+  //   filepath: selectedTrack.filepath
+  // })
+  // console.log('delete response ', response)
 }
 
 onMounted(() => {})
@@ -60,13 +61,16 @@ onMounted(() => {})
   .row {
     margin-bottom: 0rem;
   }
+
   .col {
     padding: 0;
     margin-bottom: 0.5rem;
   }
+
   .input-wrap {
     margin-bottom: 0.5rem;
   }
+
   .v-input {
     height: 40px;
   }

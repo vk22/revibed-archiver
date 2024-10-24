@@ -98,6 +98,16 @@ class MainController {
       res.status(500).json(e)
     }
   }
+  async setID3TagsOneTrack(req, res) {
+    const metadata = req.body.metadata
+    const filepath = req.body.filepath
+    const result = await FilesService.setID3Tags(metadata, filepath)
+    //console.log('result ', result)
+    res.json({
+      success: true,
+      result: result
+    })
+  }
   async archiveProject(req, res) {
     try {
       // console.log('archiveProject req.body', req.body)

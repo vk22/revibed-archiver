@@ -16,5 +16,4 @@ class ErrorsService {
     this.errors = []
   }
 }
-
-module.exports = new ErrorsService()
+export default new ErrorsService()

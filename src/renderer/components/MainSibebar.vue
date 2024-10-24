@@ -175,6 +175,7 @@ onMounted(() => {})
 .sidebar {
   background: #fff !important;
   z-index: 9;
+
   .main-logo {
     width: 100%;
     height: 50px;
@@ -188,14 +189,17 @@ onMounted(() => {})
     padding-left: 1rem;
     margin-bottom: 0.75rem;
     z-index: 99;
+
     &__wrap {
       line-height: 0.8;
+
       .logo {
         cursor: pointer;
         display: flex;
         color: #333;
         font-weight: 600;
         align-items: center;
+
         // font-size: 0.75rem;
         img {
           margin-right: 15px;
@@ -204,6 +208,7 @@ onMounted(() => {})
       }
     }
   }
+
   .folder-path {
     border-bottom: 1px solid #ddd;
   }
@@ -211,8 +216,10 @@ onMounted(() => {})
   .folder-files {
     border-bottom: 1px solid #ddd;
     padding-left: 1rem;
+
     &__title {
     }
+
     &__item {
       display: flex;
       align-items: center;
@@ -255,6 +262,7 @@ onMounted(() => {})
         opacity: 1;
         border: 4px solid transparent;
         transition: all 0.15s ease-in-out;
+
         &.main {
           opacity: 1;
           border: 4px solid #0063e2;
@@ -262,6 +270,7 @@ onMounted(() => {})
       }
     }
   }
+
   .errors-block {
     &__item {
       .v-alert__content {
@@ -295,13 +304,16 @@ onMounted(() => {})
   .row {
     margin-bottom: 0rem;
   }
+
   .col {
     padding: 0;
     margin-bottom: 0.5rem;
   }
+
   .input-wrap {
     margin-bottom: 0.5rem;
   }
+
   .v-input {
     height: 40px;
   }

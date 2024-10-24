@@ -1,7 +1,7 @@
-const UserLocalData = import('../services/userLocalData')
+import UserLocalData from './userLocalData.js'
 
 class UserService {
-  constructor() { }
+  constructor() {}
 
   async setUserData(data) {
     console.log('setUserData ', data)
@@ -9,8 +9,9 @@ class UserService {
   }
 
   async getUserData() {
+    console.log('getUserData')
     return await UserLocalData.get()
   }
 }
 
-module.exports = new UserService()
+export default new UserService()

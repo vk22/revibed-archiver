@@ -1,7 +1,7 @@
 const UserLocalData = require('../services/userLocalData')
 
 class UserService {
-  constructor() { }
+  constructor() {}
 
   async setUserData(data) {
     console.log('setUserData ', data)

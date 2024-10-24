@@ -2,8 +2,8 @@
 const dotenv = require('dotenv')
 
 const baseConfig = {
-  productName: 'Vutron',
-  appId: 'com.vutron.vutron',
+  productName: 'Revibed Archiver',
+  appId: 'revibed-archiver',
   asar: true,
   extends: null,
   compression: 'maximum',
@@ -11,12 +11,13 @@ const baseConfig = {
   directories: {
     output: './release/${version}'
   },
+  asarUnpack: ['**/node_modules/sharp/**/*', '**/node_modules/@img/**/*'],
   mac: {
     bundleVersion: '1.0',
     hardenedRuntime: true,
     gatekeeperAssess: false,
     notarize: false,
-    icon: 'buildAssets/icons/icon.icns',
+    icon: 'buildAssets/icons/icon.png',
     type: 'distribution',
     target: [
       {

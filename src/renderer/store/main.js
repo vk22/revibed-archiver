@@ -217,24 +217,45 @@ export const useMainStore = defineStore('main', {
       this.onYoutubeCount = data.onYoutubeCount
       this.countries = data.countries
     },
-    async updateReleasesDB() {
-      const { data } = await axios.post(`http://localhost:8000/api/update-revibed/`, {
-        releases: this.allReleases
-      })
-      console.log('data ', data)
-    },
+    // async updateReleasesDB() {
+    //   const { data } = await axios.post(`http://localhost:8000/api/update-revibed/`, {
+    //     releases: this.allReleases
+    //   })
+    //   console.log('data ', data)
+    // },
+    // async cc() {
+    //   const dataParsed = JSON.parse(JSON.stringify(data))
+    //   return new Promise((resolve, reject) => {
+    //     window.mainApi.invoke('checkDropedFolder', dataParsed).then((result) => {
+    //       console.log('AuthService result ', result)
+    //       resolve(result)
+    //     })
+    //   })
+    // },
     async checkDropedFolder() {
       console.log('checkDropedFolder Store')
       this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/check-droped-folder/`, {
+      const response = await window.mainApi.invoke('checkDropedFolder', {
         folder: this.folderPath
       })
-      console.log('checkDropedFolder response ', data)
-      if (data.success) {
-        this.setDropedData(data)
+      console.log('checkDropedFolder response ', response)
+      if (response.success) {
+        this.setDropedData(response)
       }
       this.setLoading({ state: false, finish: false })
     },
+    // async checkDropedFolder() {
+    //   console.log('checkDropedFolder Store')
+    //   this.setLoading({ state: true })
+    //   const { data } = await axios.post(`http://localhost:8000/api/check-droped-folder/`, {
+    //     folder: this.folderPath
+    //   })
+    //   console.log('checkDropedFolder response ', data)
+    //   if (data.success) {
+    //     this.setDropedData(data)
+    //   }
+    //   this.setLoading({ state: false, finish: false })
+    // },
     setDropedData(data) {
       console.log('setDropedData')
       this.folderDropped = true
@@ -258,12 +279,12 @@ export const useMainStore = defineStore('main', {
     },
     async getFilesFromFolder() {
       this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/get-files-from-folder/`, {
+      const response = await window.mainApi.invoke('getFilesFromFolder', {
         folder: this.folderPath
       })
-      console.log('getFilesFromFolder response ', data)
-      if (data.success) {
-        this.setFilesData(data)
+      console.log('getFilesFromFolder response ', response)
+      if (response.success) {
+        this.setFilesData(response)
       }
       this.setLoading({ state: false, finish: false })
     },
@@ -274,41 +295,42 @@ export const useMainStore = defineStore('main', {
         this.globalErrors = data.files.errors
       }
     },
-    async checkFiles() {
-      this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/check-files/`)
-      console.log('checkFiles response ', data)
-      this.restoredFilesList = data.restoredFilesList
-      this.setLoading({ state: false, finish: false })
-    },
     async downloadDiscogsImages() {
-      const { data } = await axios.post(`http://localhost:8000/api/download-discogs-images/`)
-      console.log('data response ', data)
-      if (data.success) {
-        this.discogsImages = data.images
+      const response = await window.mainApi.invoke('downloadDiscogsImages', {
+        folder: this.folderPath
+      })
+      // const { data } = await axios.post(`http://localhost:8000/api/download-discogs-images/`)
+      console.log('data response ', response)
+      if (response.success) {
+        this.discogsImages = response.images
         await this.getFilesFromFolder()
       }
     },
     async parseDiscogs(releaseID) {
       this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/parse-discogs-link/`, {
+      const response = await window.mainApi.invoke('parseRelease', {
         releaseID: releaseID,
         folder: this.folderPath,
         discogsMergeSubtracks: this.discogsMergeSubtracks
       })
-      console.log('parseDiscogs response ', data)
-      if (data.releaseData) {
-        this.rip.title = data.releaseData.title
-        this.rip.artist = data.releaseData.artist
-        this.rip.year = data.releaseData.year
-        this.rip.country = data.releaseData.country
-        this.rip.format = data.releaseData.format
-        this.rip.tracklist = data.releaseData.tracklist
-        this.rip.images = data.releaseData.images
-        this.rip.styles = data.releaseData.styles
+      // const { data } = await axios.post(`http://localhost:8000/api/parse-discogs-link/`, {
+      //   releaseID: releaseID,
+      //   folder: this.folderPath,
+      //   discogsMergeSubtracks: this.discogsMergeSubtracks
+      // })
+      console.log('parseDiscogs response ', response)
+      if (response.releaseData) {
+        this.rip.title = response.releaseData.title
+        this.rip.artist = response.releaseData.artist
+        this.rip.year = response.releaseData.year
+        this.rip.country = response.releaseData.country
+        this.rip.format = response.releaseData.format
+        this.rip.tracklist = response.releaseData.tracklist
+        this.rip.images = response.releaseData.images
+        this.rip.styles = response.releaseData.styles
         this.releaseData = true
-        this.rip.errors = data.errors
-        this.folderTemp = data.folderTemp
+        this.rip.errors = response.errors
+        this.folderTemp = response.folderTemp
         this.discogsRequest = true
         this.canSave = true
         this.dialog = true
@@ -322,12 +344,20 @@ export const useMainStore = defineStore('main', {
     async setDiscogsTags() {
       if (this.mainImage.filepath) {
         this.setLoading({ state: true })
-        const { data } = await axios.post(`http://localhost:8000/api/set-discogs-tags/`, {
-          mainImage: this.mainImage,
+        // console.log('this.mainImage ', this.mainImage)
+        // console.log('this.matchType ', this.matchType)
+        const mainImageParced = JSON.parse(JSON.stringify(this.mainImage))
+        const response = await window.mainApi.invoke('setDiscogsTags', {
+          mainImage: mainImageParced,
           matchType: this.matchType
         })
-        console.log('setDiscogsTags response ', data)
-        if (data.success) {
+        // const { data } = await axios.post(`http://localhost:8000/api/set-discogs-tags/`, {
+        //   mainImage: this.mainImage,
+        //   matchType: this.matchType
+        // })
+
+        console.log('setDiscogsTags response ', response)
+        if (response.success) {
           await this.getFilesFromFolder()
         }
         this.setLoading({ state: false, finish: false })
@@ -335,22 +365,39 @@ export const useMainStore = defineStore('main', {
         alert('Choose main image')
       }
     },
+    async setTrackID3Tags(selectedTrack) {
+      console.log('setTrackID3Tags STORE selectedTrack ', selectedTrack)
+      const response = await window.mainApi.invoke('setID3TagsOneTrack', {
+        metadata: selectedTrack.metadata,
+        filepath: selectedTrack.filepath
+      })
+      // const response = await axios.post('http://localhost:8000/api/set-metadata-one-track', {
+      //   metadata: selectedTrack.metadata,
+      //   filepath: selectedTrack.filepath
+      // })
+      console.log('setTrackID3Tags response ', response)
+    },
     async archiveProject() {
       this.setLoading({ state: true })
-      console.log('this.sourceData ', this.sourceData)
-      const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, {
-        source: this.sourceData
+      // console.log('this.sourceData ', this.sourceData)
+      const sourceDataParced = JSON.parse(JSON.stringify(this.sourceData))
+      const response = await window.mainApi.invoke('archiveProject', {
+        source: sourceDataParced
       })
-      console.log('archiveProject ', data)
-      if (data.success) {
+      // const { data } = await axios.post(`http://localhost:8000/api/archive-project/`, {
+      //   source: this.sourceData
+      // })
+      console.log('archiveProject ', response)
+      if (response.success) {
         this.setLoading({ state: false, finish: true })
         this.$reset
       }
     },
     async editImage(imageData) {
       console.log('imageData ', imageData)
-      const { data } = await axios.post('http://localhost:8000/api/edit-image', imageData)
-      if (data.success) {
+      const response = await window.mainApi.invoke('editImage', imageData)
+      // const { data } = await axios.post('http://localhost:8000/api/edit-image', imageData)
+      if (response.success) {
         this.selectedVisual = {
           filename: undefined,
           filepath: undefined
@@ -360,10 +407,13 @@ export const useMainStore = defineStore('main', {
     },
     async deleteFile(filename) {
       this.setLoading({ state: true })
-      const { data } = await axios.post(`http://localhost:8000/api/delete-file/`, {
+      const response = await window.mainApi.invoke('deleteFile', {
         filename: filename
       })
-      if (data.success) {
+      // const { data } = await axios.post(`http://localhost:8000/api/delete-file/`, {
+      //   filename: filename
+      // })
+      if (response.success) {
         await this.getFilesFromFolder()
         this.setLoading({ state: false, finish: false })
       }
@@ -442,10 +492,11 @@ export const useMainStore = defineStore('main', {
         let releaseData = this.releases.find((el) => el._id === item)
         return releaseData
       })
-      const { data } = await axios.post(`http://localhost:8000/api/export-releases-to-rvbd/`, {
-        releases: releases2
+      const releasesParced = JSON.parse(JSON.stringify(releases2))
+      const response = await window.mainApi.invoke('getReleaseForRVBD', {
+        releases: releasesParced
       })
-      console.log('exportReleasesToRVBD response: ', data)
+      console.log('exportReleasesToRVBD response: ', response)
       this.setLoading({ state: false, finish: true })
     },
     async exportReleasesToYoutube(releases) {
@@ -454,10 +505,12 @@ export const useMainStore = defineStore('main', {
         let releaseData = this.releases.find((el) => el._id === item)
         return releaseData
       })
-      const { data } = await axios.post(`http://localhost:8000/api/export-releases-to-youtube/`, {
-        releases: releases2
+      const releasesParced = JSON.parse(JSON.stringify(releases2))
+
+      const response = await window.mainApi.invoke('getReleaseForYoutube', {
+        releases: releasesParced
       })
-      console.log('exportReleasesToYoutube response: ', data)
+      console.log('exportReleasesToYoutube response: ', response)
       this.setLoading({ state: false, finish: true })
     }
   },
@@ -595,7 +648,9 @@ export const useMainStore = defineStore('main', {
 })
 
 function playSound() {
-  const audio = new Audio('../finish2.mp3')
+  const audio = new Audio(
+    'file:////Users/kushnir/Works/revibed-archiver/src/renderer/assets/sound/finish2.mp3'
+  )
   audio.play()
 }
 

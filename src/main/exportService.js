@@ -1,17 +1,13 @@
 const fs = require('fs-extra')
 const { join, extname, basename } = require('path')
 const archiver = require('archiver')
-const { rimraf, rimrafSync } = require('rimraf')
-const kxFolder = '/Volumes/WD/KX-rips/'
-const MyStore = require('./kx-store.js')
-const store = new MyStore({
-  configName: 'music-db'
-})
+// const { rimraf, rimrafSync } = require('rimraf')
+import { rimraf } from 'rimraf'
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 const axios = require('axios')
 const child_process = require('child_process')
-const initFFmpeg = require('../services/ffmpegService')
+import initFFmpeg from './ffmpegService.js'
 const { _ } = require('core-js')
 let ffmpegPath
 initFFmpeg().then((data) => {
@@ -59,6 +55,7 @@ class ExportService {
   }
 
   async sendReleasesToYoutube(releases, userFolders) {
+    console.log('sendReleasesToYoutube ', releases, userFolders)
     const storageFolder = `${userFolders.storageFolder}`
     for (var i = 0; i < releases.length; i++) {
       let releaseData = releases[i]
@@ -264,5 +261,4 @@ class ExportService {
     return true
   }
 }
-
-module.exports = new ExportService()
+export default new ExportService()

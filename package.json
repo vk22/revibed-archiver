@@ -54,6 +54,7 @@
     "node-taglib-sharp": "^5.2.3",
     "pinia": "^2.1.7",
     "sharp": "^0.33.5",
+    "sound-play": "^1.1.0",
     "vue": "^3.4.21",
     "vue-i18n": "^9.10.2",
     "vue-router": "^4.3.0",

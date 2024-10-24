@@ -1,14 +1,54 @@
 import { ipcMain, shell, IpcMainEvent, dialog } from 'electron'
 import Constants from './utils/Constants'
+import MainController from './mainController.js'
 
 /*
  * IPC Communications
  * */
 export default class IPCs {
   static initialize(): void {
-    // Get application version
-    ipcMain.handle('msgRequestGetVersion', () => {
-      return Constants.APP_VERSION
+    /// user
+    ipcMain.handle('getUserLocalData', async () => {
+      return await MainController.getUserLocalData()
+    })
+
+    ipcMain.handle('setUserLocalData', async (event, data) => {
+      return await MainController.setUserLocalData(data)
+    })
+
+    /// files
+    ipcMain.handle('checkDropedFolder', async (event, data) => {
+      return await MainController.checkDropedFolder(data)
+    })
+    ipcMain.handle('getFilesFromFolder', async (event, data) => {
+      return await MainController.getFilesFromFolder(data)
+    })
+    ipcMain.handle('setDiscogsTags', async (event, data) => {
+      return await MainController.setDiscogsTags(data)
+    })
+    ipcMain.handle('setID3TagsOneTrack', async (event, data) => {
+      return await MainController.setID3TagsOneTrack(data)
+    })
+    ipcMain.handle('editImage', async (event, data) => {
+      return await MainController.editImage(data)
+    })
+    ipcMain.handle('archiveProject', async (event, data) => {
+      return await MainController.archiveProject(data)
+    })
+    ipcMain.handle('deleteFile', async (event, data) => {
+      return await MainController.deleteFile(data)
+    })
+    ipcMain.handle('parseRelease', async (event, data) => {
+      return await MainController.parseRelease(data)
+    })
+    ipcMain.handle('downloadDiscogsImages', async (event, data) => {
+      return await MainController.downloadDiscogsImages(data)
+    })
+    ipcMain.handle('getReleaseForRVBD', async (event, data) => {
+      return await MainController.getReleaseForRVBD(data)
+    })
+    ipcMain.handle('getReleaseForYoutube', async (event, data) => {
+      return await MainController.getReleaseForYoutube(data)
     })
 
     // Open url via web browser

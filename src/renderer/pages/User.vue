@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/renderer/store/user'
 const authStore = useUserStore()
@@ -47,7 +47,14 @@ const user = computed(() => {
 })()
 
 const localFolders = computed(() => {
-  return authStore.localFolders
+  if (authStore.localFolders) {
+    return authStore.localFolders
+  } else {
+    return {
+      storageFolder: '',
+      exportFolder: ''
+    }
+  }
 })
 
 console.log('localFolders ', localFolders)

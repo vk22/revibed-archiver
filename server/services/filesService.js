@@ -189,6 +189,69 @@ class FilesService {
     //console.log('file ', file);
     return file
   }
+  async setID3Tags(tagsData, filepath, pathToPic) {
+    let errors = []
+    /// tagsData = { trackTitle, releaseAlbum, artists, albumArtists, styleAsString, year, indexTrack, trackCount, media, sleeve, formatName, formatDescription  }
+    return new Promise(function (resolve, reject) {
+      console.log('setID3Tags tagsData ', tagsData)
+      console.log('setID3Tags filepath ', filepath)
+
+      const { title, album, performers, albumArtists, genres, year, track, trackCount } = tagsData
+
+      async function start() {
+        try {
+          const myFile = File.createFromPath(filepath)
+          // if (pathToPic) {
+          //   const pic = {
+          //     data: ByteVector.fromPath(pathToPic),
+          //     mimeType: 'image/jpeg',
+          //     type: PictureType.FrontCover,
+          //     filename: 'Cover.jpg',
+          //     description: 'Cover.jpg'
+          //   }
+          //   myFile.tag.pictures = [pic]
+          // }
+          if (title) {
+            myFile.tag.title = title
+          }
+          // if (performers.length) {
+          //   myFile.tag.performers = [performers]
+          // }
+          // if (album) {
+          //   myFile.tag.album = album
+          // }
+          // if (albumArtists.length) {
+          //   myFile.tag.albumArtists = [albumArtists]
+          // }
+          // if (genres) {
+          //   myFile.tag.genres = genres
+          // }
+          // if (year) {
+          //   myFile.tag.year = parseInt(year)
+          // }
+          // if (track) {
+          //   myFile.tag.track = track
+          // }
+          // if (trackCount) {
+          //   myFile.tag.trackCount = trackCount
+          // }
+
+          myFile.save()
+          myFile.dispose()
+
+          resolve('addID3Tags done')
+        } catch (err) {
+          console.log(typeof err)
+          console.log(err.message)
+          errors.push({ message: err.message, trackTitle: title })
+          resolve('addID3Tags done')
+        }
+      }
+      start()
+    }).then((error) => {
+      return { type: 'setID3Tags', errors: errors }
+    })
+  }
   changeCoverName(name) {
     let arr = name.split('.')
     let filename = `${arr[0]}-${Math.floor(Math.random() * 10000)}`
@@ -274,7 +337,7 @@ class FilesService {
     return new Promise(function (resolve, reject) {
       if (imageSize > 600) {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .resize(600, 600)
               .jpeg({
@@ -295,7 +358,7 @@ class FilesService {
         }
       } else {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .jpeg({
                 quality: IMG_QUALITY
@@ -333,65 +396,39 @@ class FilesService {
         tracklist
       } = releaseData
 
-        ; (async () => {
-          const listOfPromises = files.map(async (file, index) => {
-            const indexTrack = index + 1
-            const filename = file.split('.').slice(0, -1).join('.')
-            const fileExt = extname(file)
-            let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
-            if (file[0] !== '.') {
-              const metadata = await mm.parseFile(folderDir + file)
-              const metadataTitle = metadata.common.title
-              //console.log('matchType', matchType)
-              let trackData = tracklist.find((tracklistItem) => {
-                /// поиск по matchType
-                console.log(
-                  'поиск по matchType ',
-                  filename,
-                  tracklistItem.position,
-                  filename === tracklistItem.position
-                )
-                if (tracklistItem.position) {
-                  return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
-                }
-              })
-              console.log('prepareMetadata trackData ', trackData)
-              //// если есть совпадение
-              if (trackData) {
-                if (trackData.position != '') {
-                  //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
-                  trackArtist = getArtistName(trackData.artists, artist)
-                  trackTitle = trackData.title.replace(/\//g, '-')
-                  tagsData = {
-                    trackTitle: trackTitle,
-                    releaseAlbum: title,
-                    artists: trackArtist,
-                    albumArtists: albumArtists,
-                    styleAsString: styleAsString,
-                    year: year,
-                    indexTrack: indexTrack,
-                    trackCount: trackCount,
-                    media: media,
-                    sleeve: sleeve,
-                    formatName: format,
-                    formatDescription: formatDescription
-                  }
-                  oldPath = folderDir + file
-                  newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
-                  newPath = folderDir + newFilename
-                  if (oldPath !== newPath) {
-                    try {
-                      fs.renameSync(oldPath, newPath)
-                    } catch (err) {
-                      console.log(err)
-                    }
-                  }
-                }
-              } else {
+      ;(async () => {
+        const listOfPromises = files.map(async (file, index) => {
+          const indexTrack = index + 1
+          const filename = file.split('.').slice(0, -1).join('.')
+          const fileExt = extname(file)
+          let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
+          if (file[0] !== '.') {
+            const metadata = await mm.parseFile(folderDir + file)
+            const metadataTitle = metadata.common.title
+            //console.log('matchType', matchType)
+            let trackData = tracklist.find((tracklistItem) => {
+              /// поиск по matchType
+              console.log(
+                'поиск по matchType ',
+                filename,
+                tracklistItem.position,
+                filename === tracklistItem.position
+              )
+              if (tracklistItem.position) {
+                return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
+              }
+            })
+            console.log('prepareMetadata trackData ', trackData)
+            //// если есть совпадение
+            if (trackData) {
+              if (trackData.position != '') {
+                //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
+                trackArtist = getArtistName(trackData.artists, artist)
+                trackTitle = trackData.title.replace(/\//g, '-')
                 tagsData = {
-                  trackTitle: '',
+                  trackTitle: trackTitle,
                   releaseAlbum: title,
-                  artists: [artist],
+                  artists: trackArtist,
                   albumArtists: albumArtists,
                   styleAsString: styleAsString,
                   year: year,
@@ -402,18 +439,44 @@ class FilesService {
                   formatName: format,
                   formatDescription: formatDescription
                 }
-                newPath = folderDir + file
-                errors.push({ message: 'Трек не найден (RESTORED)' })
+                oldPath = folderDir + file
+                newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
+                newPath = folderDir + newFilename
+                if (oldPath !== newPath) {
+                  try {
+                    fs.renameSync(oldPath, newPath)
+                  } catch (err) {
+                    console.log(err)
+                  }
+                }
               }
-              //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
-              return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+            } else {
+              tagsData = {
+                trackTitle: '',
+                releaseAlbum: title,
+                artists: [artist],
+                albumArtists: albumArtists,
+                styleAsString: styleAsString,
+                year: year,
+                indexTrack: indexTrack,
+                trackCount: trackCount,
+                media: media,
+                sleeve: sleeve,
+                formatName: format,
+                formatDescription: formatDescription
+              }
+              newPath = folderDir + file
+              errors.push({ message: 'Трек не найден (RESTORED)' })
             }
-          })
-          console.log('listOfPromises ', listOfPromises)
-          const result = await Promise.all(listOfPromises)
-          console.log('prepareMetadata result ', JSON.stringify(result))
-          resolve(result)
-        })()
+            //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
+            return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+          }
+        })
+        console.log('listOfPromises ', listOfPromises)
+        const result = await Promise.all(listOfPromises)
+        console.log('prepareMetadata result ', JSON.stringify(result))
+        resolve(result)
+      })()
 
       // result.forEach((item) => {
       //   if (item.errors.length) {

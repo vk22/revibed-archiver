@@ -64,6 +64,7 @@ export const useUserStore = defineStore('user', {
     },
     setUserLocalData(data) {
       console.log('setUserLocalData store', data)
+      // window.mainApi.invoke('setUserLocalData', data)
       return AuthService.setUserLocalData(data).then(
         (response) => {
           return Promise.resolve(response.data)

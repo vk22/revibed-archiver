@@ -35,4 +35,4 @@ const ffmpegPath = function () {
   })
 }
 
-module.exports = ffmpegPath
+export default ffmpegPath

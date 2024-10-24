@@ -116,4 +116,4 @@ class ProjectService {
   }
 }
 
-module.exports = new ProjectService()
+export default new ProjectService()

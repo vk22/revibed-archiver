@@ -7,12 +7,12 @@ const { ByteVector, File, PictureType, Picture } = require('node-taglib-sharp')
 const allowedAudioFormats = ['.aiff', '.aif', '.flac', '.wav']
 const allowedVisualFormats = ['.jpg', '.jpeg', '.JPG', '.JPEG', '.png', '.PNG', '.webp']
 const mm = require('music-metadata')
-const { getArtistName } = require('./utils')
+// import getArtistName from './utils.js'
 const IMG_QUALITY = 50
 const RESIZE_WIDTH = 900 //px
 
 //// ffmpeg
-const initFFmpeg = require('../services/ffmpegService')
+import initFFmpeg from './ffmpegService.js'
 let ffmpegPath
 initFFmpeg().then((data) => {
   ffmpegPath = data
@@ -35,8 +35,37 @@ const matchTypesFunctions = {
 }
 
 //// Services
-const ErrorsService = require('../services/errorsService')
-const ProjectService = require('../services/projectService')
+import ErrorsService from './errorsService.js'
+import ProjectService from './projectService.js'
+
+function getArtistName(artists, artist) {
+  if (artists) {
+    let artistsNames = []
+    artists.forEach((item) => {
+      let name = item.anv ? item.anv : item.name
+      let nameHandled = artistNameHandler(name)
+      artistsNames.push(nameHandled)
+    })
+    return artistsNames.join(', ')
+  } else {
+    return artist
+  }
+}
+
+/// remove artist count from name
+function artistNameHandler(str) {
+  function isNumber(n) {
+    return Number(n) === n
+  }
+  let result
+  let afterName = str.substring(str.indexOf('(') + 1, str.lastIndexOf(')'))
+  if (afterName && isNumber(+afterName)) {
+    result = str.substring(0, str.indexOf('(') - 1)
+  } else {
+    result = str
+  }
+  return result
+}
 
 class FilesService {
   constructor() {
@@ -274,7 +303,7 @@ class FilesService {
     return new Promise(function (resolve, reject) {
       if (imageSize > 600) {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .resize(600, 600)
               .jpeg({
@@ -295,7 +324,7 @@ class FilesService {
         }
       } else {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .jpeg({
                 quality: IMG_QUALITY
@@ -333,65 +362,39 @@ class FilesService {
         tracklist
       } = releaseData
 
-        ; (async () => {
-          const listOfPromises = files.map(async (file, index) => {
-            const indexTrack = index + 1
-            const filename = file.split('.').slice(0, -1).join('.')
-            const fileExt = extname(file)
-            let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
-            if (file[0] !== '.') {
-              const metadata = await mm.parseFile(folderDir + file)
-              const metadataTitle = metadata.common.title
-              //console.log('matchType', matchType)
-              let trackData = tracklist.find((tracklistItem) => {
-                /// поиск по matchType
-                console.log(
-                  'поиск по matchType ',
-                  filename,
-                  tracklistItem.position,
-                  filename === tracklistItem.position
-                )
-                if (tracklistItem.position) {
-                  return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
-                }
-              })
-              console.log('prepareMetadata trackData ', trackData)
-              //// если есть совпадение
-              if (trackData) {
-                if (trackData.position != '') {
-                  //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
-                  trackArtist = getArtistName(trackData.artists, artist)
-                  trackTitle = trackData.title.replace(/\//g, '-')
-                  tagsData = {
-                    trackTitle: trackTitle,
-                    releaseAlbum: title,
-                    artists: trackArtist,
-                    albumArtists: albumArtists,
-                    styleAsString: styleAsString,
-                    year: year,
-                    indexTrack: indexTrack,
-                    trackCount: trackCount,
-                    media: media,
-                    sleeve: sleeve,
-                    formatName: format,
-                    formatDescription: formatDescription
-                  }
-                  oldPath = folderDir + file
-                  newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
-                  newPath = folderDir + newFilename
-                  if (oldPath !== newPath) {
-                    try {
-                      fs.renameSync(oldPath, newPath)
-                    } catch (err) {
-                      console.log(err)
-                    }
-                  }
-                }
-              } else {
+      ;(async () => {
+        const listOfPromises = files.map(async (file, index) => {
+          const indexTrack = index + 1
+          const filename = file.split('.').slice(0, -1).join('.')
+          const fileExt = extname(file)
+          let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
+          if (file[0] !== '.') {
+            const metadata = await mm.parseFile(folderDir + file)
+            const metadataTitle = metadata.common.title
+            //console.log('matchType', matchType)
+            let trackData = tracklist.find((tracklistItem) => {
+              /// поиск по matchType
+              console.log(
+                'поиск по matchType ',
+                filename,
+                tracklistItem.position,
+                filename === tracklistItem.position
+              )
+              if (tracklistItem.position) {
+                return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
+              }
+            })
+            console.log('prepareMetadata trackData ', trackData)
+            //// если есть совпадение
+            if (trackData) {
+              if (trackData.position != '') {
+                //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
+                trackArtist = getArtistName(trackData.artists, artist)
+                trackTitle = trackData.title.replace(/\//g, '-')
                 tagsData = {
-                  trackTitle: '',
+                  trackTitle: trackTitle,
                   releaseAlbum: title,
-                  artists: [artist],
+                  artists: trackArtist,
                   albumArtists: albumArtists,
                   styleAsString: styleAsString,
                   year: year,
@@ -402,18 +405,44 @@ class FilesService {
                   formatName: format,
                   formatDescription: formatDescription
                 }
-                newPath = folderDir + file
-                errors.push({ message: 'Трек не найден (RESTORED)' })
+                oldPath = folderDir + file
+                newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
+                newPath = folderDir + newFilename
+                if (oldPath !== newPath) {
+                  try {
+                    fs.renameSync(oldPath, newPath)
+                  } catch (err) {
+                    console.log(err)
+                  }
+                }
               }
-              //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
-              return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+            } else {
+              tagsData = {
+                trackTitle: '',
+                releaseAlbum: title,
+                artists: [artist],
+                albumArtists: albumArtists,
+                styleAsString: styleAsString,
+                year: year,
+                indexTrack: indexTrack,
+                trackCount: trackCount,
+                media: media,
+                sleeve: sleeve,
+                formatName: format,
+                formatDescription: formatDescription
+              }
+              newPath = folderDir + file
+              errors.push({ message: 'Трек не найден (RESTORED)' })
             }
-          })
-          console.log('listOfPromises ', listOfPromises)
-          const result = await Promise.all(listOfPromises)
-          console.log('prepareMetadata result ', JSON.stringify(result))
-          resolve(result)
-        })()
+            //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
+            return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+          }
+        })
+        console.log('listOfPromises ', listOfPromises)
+        const result = await Promise.all(listOfPromises)
+        console.log('prepareMetadata result ', JSON.stringify(result))
+        resolve(result)
+      })()
 
       // result.forEach((item) => {
       //   if (item.errors.length) {
@@ -704,4 +733,4 @@ class FilesService {
   }
 }
 
-module.exports = new FilesService()
+export default new FilesService()

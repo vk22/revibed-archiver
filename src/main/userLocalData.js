@@ -45,4 +45,4 @@ class UserLocalDataStore {
 }
 
 // expose the class
-module.exports = new UserLocalDataStore()
+export default new UserLocalDataStore()

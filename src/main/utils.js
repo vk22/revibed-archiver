@@ -182,12 +182,14 @@ function renameFolder(data) {
   })
 }
 
-module.exports = {
-  prepareReleaseData,
-  getArtistName,
-  artistNameHandler,
-  removeRawFromName,
-  base64_encode,
-  createLineageFile,
-  renameFolder
-}
+// module.exports = {
+//   prepareReleaseData,
+//   getArtistName,
+//   artistNameHandler,
+//   removeRawFromName,
+//   base64_encode,
+//   createLineageFile,
+//   renameFolder
+// }
+
+export default getArtistName()
