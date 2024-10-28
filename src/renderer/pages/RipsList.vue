@@ -36,6 +36,11 @@
 
         <v-data-table v-model="selected" :headers="headers" :items="ripsList" :search="search" :single-select="true"
           density="compact" :hide-default-footer="true" show-select item-value="_id" items-per-page="200">
+          <template v-slot:item.title="{ item }">
+            <router-link :to="{ name: 'RipPage', params: { id: item.releaseID } }">
+              {{ item.title }} {{ item.releaseID }}
+            </router-link>
+          </template>
           <template v-slot:item.updated="{ item }">
             {{ formatDateEn(item.updated) }}
           </template>
@@ -146,13 +151,13 @@ const onRevibedCount = computed(() => {
 
 /// data
 const headers = ref([
-  { key: 'source', title: 'Source' },
   { key: 'releaseID', title: 'Discogs Release' },
-  { key: 'artist', title: 'Artist' },
   { key: 'title', title: 'Title' },
+  { key: 'artist', title: 'Artist' },
+  { key: 'source', title: 'Source' },
   { key: 'youtubeVideoID', title: 'Youtube Link' },
-  { key: 'updated', title: 'Date' },
-  { key: 'onRevibed', title: 'Revibed' }
+  { key: 'onRevibed', title: 'Revibed' },
+  { key: 'updated', title: 'Date' }
   // { text: "Errors", value: "errors", sortable: false },
 ])
 

@@ -1,6 +1,7 @@
 import auth from '@/renderer/middleware/auth'
 import NewProject from '@/renderer/pages/NewProject'
 import RipsList from '@/renderer/pages/RipsList'
+import RipPage from '@/renderer/pages/RipPage'
 import Login from '@/renderer/pages/Login'
 import User from '@/renderer/pages/User'
 import { createRouter, createWebHashHistory } from 'vue-router'
@@ -26,6 +27,12 @@ const routes = [
     path: '/rips-list',
     name: 'RipsList',
     component: RipsList,
+    meta: { requiresAuth: true, middleware: auth }
+  },
+  {
+    path: '/rip-page/:id',
+    name: 'RipPage',
+    component: RipPage,
     meta: { requiresAuth: true, middleware: auth }
   },
   {

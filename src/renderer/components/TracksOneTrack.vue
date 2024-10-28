@@ -1,27 +1,11 @@
 <template>
   <div class="track-card-small" v-if="track">
-    <div class="track-player">
-      <div
-        class="btn-audio pause"
-        @click="pauseTrack(index)"
-        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title"
-      >
-        <svg
-          width="22px"
-          height="30px"
-          viewBox="0 0 22 30"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <g
-            id="Page-1"
-            stroke="none"
-            stroke-width="1"
-            fill="none"
-            fill-rule="evenodd"
-            opacity="0.900928442"
-          >
+    <!-- <div class="track-player">
+      <div class="btn-audio pause" @click="pauseTrack(index)"
+        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title">
+        <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
             <g id="pauseBtn" fill="#000000">
               <g id="Page-1">
                 <g id="Desktop-HD-Copy-3">
@@ -39,35 +23,11 @@
           </g>
         </svg>
       </div>
-      <div
-        class="btn-audio play"
-        @click="
-          selectTrack(track)
-          playTrack(index, track.title, rip.projectID)
-        "
-        v-else
-      >
-        <svg
-          width="26px"
-          height="32px"
-          viewBox="0 0 26 32"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <g
-            id="Page-1"
-            stroke="none"
-            stroke-width="1"
-            fill="none"
-            fill-rule="evenodd"
-            opacity="0.900928442"
-          >
-            <g
-              id="Desktop-HD-Copy-3"
-              transform="translate(-97.000000, -1135.000000)"
-              fill="#000000"
-            >
+      <div class="btn-audio play" v-else>
+        <svg width="26px" height="32px" viewBox="0 0 26 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
+            <g id="Desktop-HD-Copy-3" transform="translate(-97.000000, -1135.000000)" fill="#000000">
               <g id="player" transform="translate(0.000000, 1112.000000)">
                 <g id="Group-4" transform="translate(49.000000, 23.000000)">
                   <polygon id="Triangle" points="74 16 48 32 48 0"></polygon>
@@ -77,46 +37,20 @@
           </g>
         </svg>
       </div>
-    </div>
+    </div> -->
 
-    <div
-      class="track-info"
-      v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title"
-    >
+    <div class="track-info">
+      <div class="mr-3">
+        {{ track.position }}.
+      </div>
       <div class="track-trackname" @click="pauseTrack(index)">
         {{ track.title }}
       </div>
-      <div class="track-info__r">
+      <!-- <div class="track-info__r">
         <div class="track-duration">
           {{ track.duration }}
         </div>
-      </div>
-    </div>
-    <div class="track-info" v-else>
-      <div
-        class="track-trackname"
-        @click="
-          selectTrack(track)
-          playTrack(index, track.title)
-        "
-      >
-        {{ track.title }}
-      </div>
-      <div class="track-info__r">
-        <!-- <div class="add-to">
-                    <button class="btn icon-btn" :class="{'in-playlist': checkedtrackInStreamList(track)}" @click="addToStreamList(track)">
-                       <v-icon small>mdi-access-point</v-icon>
-                    </button>
-                  </div>
-                  <div class="add-to">
-                    <button class="btn icon-btn" :class="{'in-playlist': checkedtrackInPlaylist(track)}" @click="addToPlaylist(track)">
-                       <v-icon small>mdi-heart</v-icon>
-                    </button>
-                  </div> -->
-        <div class="track-duration">
-          {{ track.duration }}
-        </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -218,29 +152,29 @@ export default {
     //   //console.log('this.track.canSave ', this.track.canSave)
     // }
   },
-  mounted() {},
+  mounted() { },
   computed: {
-    playingIndex() {
-      return this.$store.state.player.playingIndex
-    },
-    playing() {
-      return this.$store.state.player.playing
-    },
-    playingFile() {
-      return this.$store.state.player.playingFile
-    },
-    checkPause() {
-      return this.$store.state.player.onPause
-    },
-    playlist() {
-      return this.$store.state.playlist.playlist
-    },
-    videolist() {
-      return this.$store.getters['video/getVideoList']
-    },
-    streamlist() {
-      return this.$store.getters['video/getStreamList']
-    }
+    // playingIndex() {
+    //   return this.$store.state.player.playingIndex
+    // },
+    // playing() {
+    //   return this.$store.state.player.playing
+    // },
+    // playingFile() {
+    //   return this.$store.state.player.playingFile
+    // },
+    // checkPause() {
+    //   return this.$store.state.player.onPause
+    // },
+    // playlist() {
+    //   return this.$store.state.playlist.playlist
+    // },
+    // videolist() {
+    //   return this.$store.getters['video/getVideoList']
+    // },
+    // streamlist() {
+    //   return this.$store.getters['video/getStreamList']
+    // }
   },
   created() {
     // this.$nuxt.$on('trackCanSave', (data) => {
@@ -278,6 +212,7 @@ export default {
   }
 
   &.play {
+
     // background-image: url('../assets/img/playBtn.svg');
     svg {
       width: 14px;
@@ -286,6 +221,7 @@ export default {
   }
 
   &.pause {
+
     // background-image: url('../assets/img/pauseBtn.svg');
     svg {
       width: 14px;
@@ -295,6 +231,7 @@ export default {
 }
 
 .trackItem {
+
   // transition: transform .25s 1s;
   // transform: translateY(10px);
   &.disabled {
@@ -342,7 +279,7 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding-right: 10px;
 
     &__r {
@@ -350,8 +287,7 @@ export default {
       align-items: center;
       flex-direction: row-reverse;
 
-      .track-duration {
-      }
+      .track-duration {}
 
       .add-to {
         // display: flex;
@@ -384,14 +320,16 @@ export default {
 
   &.playing {
     background: #f7f7f7;
-    & > .track-trackname {
+
+    &>.track-trackname {
       opacity: 0.5;
     }
   }
 
   &:hover {
     cursor: pointer;
-    & > .track-trackname {
+
+    &>.track-trackname {
       opacity: 0.5;
     }
   }

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { isProxy, toRaw } from 'vue';
 
 //const API_URL_LABELS = 'http://localhost:3000';
 const API_URL_LABELS = 'http://labels.kx-streams.com/api'
@@ -10,6 +11,7 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     allReleases: [],
     releases: [],
+    tracks: [],
     youtubes: [],
     artists: [],
     countries: [],
@@ -75,7 +77,8 @@ export const useMainStore = defineStore('main', {
       addToRVBD: false
     },
     onYoutubeCount: 0,
-    onRevibedCount: 0
+    onRevibedCount: 0,
+    storageFolder: undefined
   }),
   actions: {
     setLoading(data) {
@@ -117,6 +120,14 @@ export const useMainStore = defineStore('main', {
       })
       return response
     },
+    async getTracks() {
+      const response = await axios.get(`${API_URL_LABELS}/get-tracks`, {
+        headers: {
+          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+        }
+      })
+      return response
+    },
     async checkRelease(releaseID) {
       const response = await axios.post(
         `${API_URL_LABELS}/check-release`,
@@ -144,8 +155,17 @@ export const useMainStore = defineStore('main', {
       if (getReleasesData.data.success) {
         this.setReleases(getReleasesData.data)
       }
+      this.userLocalFolders = await window.mainApi.invoke('getUserLocalData')
+      this.storageFolder = toRaw(this.userLocalFolders).storageFolder
+      console.log('storageFolder ', this.storageFolder)
       this.allDataReady = true
       console.timeEnd('getAllData')
+      const getTracksData = await this.getTracks()
+      console.log('getTracksData ', getTracksData)
+      if (getTracksData.data.success) {
+        this.tracks = getTracksData.data.tracks
+      }
+
     },
     setRevibedGoods(data) {
       console.log('setRevibedGoods ', data.length)
@@ -208,7 +228,7 @@ export const useMainStore = defineStore('main', {
       this.artists = data.artists
     },
     setReleases(data) {
-      console.time('setReleases')
+      // console.log('setReleases', data)
       this.allReleases = data.releases
       this.releases = data.releases
       this.sortedLabels = data.labels
@@ -226,7 +246,7 @@ export const useMainStore = defineStore('main', {
     // async cc() {
     //   const dataParsed = JSON.parse(JSON.stringify(data))
     //   return new Promise((resolve, reject) => {
-    //     window.mainApi.invoke('checkDropedFolder', dataParsed).then((result) => {
+    //     window.mainApi.invoke('getUserLocalData', dataParsed).then((result) => {
     //       console.log('AuthService result ', result)
     //       resolve(result)
     //     })
@@ -318,7 +338,7 @@ export const useMainStore = defineStore('main', {
       //   folder: this.folderPath,
       //   discogsMergeSubtracks: this.discogsMergeSubtracks
       // })
-      console.log('parseDiscogs response ', response)
+      // console.log('parseDiscogs response ', response)
       if (response.releaseData) {
         this.rip.title = response.releaseData.title
         this.rip.artist = response.releaseData.artist
@@ -519,7 +539,7 @@ export const useMainStore = defineStore('main', {
       return state.allReleases
     },
     getReleases: (state) => {
-      console.log('getReleases store')
+      console.log('getReleases store', state.releases)
       let filters = [...state.filterState]
       console.log('getReleases filters ', filters)
       if (filters.length) {
@@ -592,6 +612,29 @@ export const useMainStore = defineStore('main', {
       } else {
         console.log('no filter')
         return state.releases
+      }
+    },
+    getStorageFolder: (state) => {
+      return state.storageFolder
+    },
+    getReleaseOne: state => (id) => {
+      // console.log('getReleaseOne ', state.releases)
+      const releases = toRaw(state.releases)
+      const storageFolder = toRaw(state.storageFolder)
+      const release = releases.find(item => item.releaseID === +id)
+
+      if (release) {
+        const localPath = `${storageFolder}/${release.releaseID}`
+        release.localPath = localPath
+        console.log('storageFolder localPath', localPath)
+        return release
+      }
+
+    },
+    getReleaseTracks: state => (id) => {
+      console.log('getReleaseTracks ', id)
+      if (state.tracks.length) {
+        return state.tracks.filter(item => item.releaseID === id).reverse()
       }
     },
     getFilesPath: (state) => {

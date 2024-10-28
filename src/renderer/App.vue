@@ -32,6 +32,7 @@
           <div class="main-container" v-if="true">
             <router-view />
           </div>
+          <Player></Player>
         </v-container>
       </v-main>
     </v-app>
@@ -40,6 +41,7 @@
 
 <script setup>
 import MainSibebar from '@/renderer/components/MainSibebar.vue'
+import Player from '@/renderer/components/Player/MainPlayer2.vue'
 // import LoginPage from '@/renderer/components/LoginPage.vue'
 import { onMounted, computed } from 'vue'
 import { useMainStore } from '@/renderer/store/main'

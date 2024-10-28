@@ -4,19 +4,31 @@
       <div class="user">
         <div class="avatar">
           <v-avatar size="x-large">
-            <v-img alt="John"
-              src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFroBand&accessoriesType=Wayfarers&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=Hoodie&clotheColor=Black&graphicType=Resist&eyeType=Cry&eyebrowType=RaisedExcitedNatural&mouthType=Serious&skinColor=DarkBrown"></v-img>
+            <v-img
+              alt="John"
+              src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFroBand&accessoriesType=Wayfarers&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=Hoodie&clotheColor=Black&graphicType=Resist&eyeType=Cry&eyebrowType=RaisedExcitedNatural&mouthType=Serious&skinColor=DarkBrown"
+            ></v-img>
           </v-avatar>
         </div>
         <div class="username">{{ user.username }}</div>
       </div>
       <div class="field">
         <label>Music Storage</label>
-        <input class="input" v-model="localFolders.storageFolder" type="text" :placeholder="'Path to local folder'" />
+        <input
+          class="input"
+          v-model="localFolders.storageFolder"
+          type="text"
+          :placeholder="'Path to local folder'"
+        />
       </div>
       <div class="field">
         <label>Export Folder</label>
-        <input class="input" v-model="localFolders.exportFolder" type="text" :placeholder="'Path to local folder'" />
+        <input
+          class="input"
+          v-model="localFolders.exportFolder"
+          type="text"
+          :placeholder="'Path to local folder'"
+        />
       </div>
       <!-- <div class="userrole">manager</div> -->
       <div class="mt-2 mb-3">
@@ -38,9 +50,9 @@ const user = computed(() => {
   return authStore.user
 })
 
-  ; (async () => {
-    await authStore.getUserLocalData()
-  })()
+;(async () => {
+  await authStore.getUserLocalData()
+})()
 
 const localFolders = computed(() => {
   if (authStore.localFolders) {
@@ -89,7 +101,7 @@ const save = () => {
     }
 
     .avatar {
-      margin-right: .75rem;
+      margin-right: 0.75rem;
     }
 
     .username {
@@ -119,7 +131,7 @@ const save = () => {
       border-radius: 4px;
       width: 100%;
       max-width: 100%;
-      font-size: .85rem;
+      font-size: 0.85rem;
 
       // @include for-700-height-only {
       //   padding: 1rem 0.75rem;
