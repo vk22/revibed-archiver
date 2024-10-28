@@ -1,19 +1,16 @@
-
 import { defineStore } from 'pinia'
 
-
 export const usePlayerStore = defineStore('player', {
-
   state: () => ({
     playlist: [],
-    initPlay: false,
+    initPlayState: false,
     loading: false,
     playingIndex: null,
     playing: false,
     playingFile: {},
     selectedTrack: undefined,
     onPause: false,
-    source: undefined,
+    source: undefined
     // playerIsActive: false
   }),
 
@@ -27,7 +24,7 @@ export const usePlayerStore = defineStore('player', {
 
     stopAndClearPlay(state) {
       this.playlist = []
-      this.initPlay = false
+      this.initPlayState = false
       this.playingIndex = null
       this.playing = false
       this.playingFile = undefined
@@ -40,16 +37,15 @@ export const usePlayerStore = defineStore('player', {
       console.log('setPlaylist ', playlist)
       this.playlist = playlist.tracks
       this.source = playlist.source
-
     },
     play(data) {
       console.log('mutations play ', data)
       this.playingIndex = data.index
       this.playingFile = {
         filename: data.filename,
-        projectID: data.projectID
+        releaseID: data.releaseID
       }
-      this.initPlay = true
+      this.initPlayState = true
       this.loading = true
     },
     pause(index) {
@@ -60,18 +56,18 @@ export const usePlayerStore = defineStore('player', {
     stop() {
       console.log('mutations stop ')
       this.playingIndex = null
-      this.initPlay = false
+      this.initPlayState = false
     },
     initPlay(play) {
       // console.log('initPlay ', this.initPlay, play)
-      this.initPlay = play
+      this.initPlayState = play
     },
     setPlayingIndex(data) {
       console.log('mutations setPlayingIndex ', data)
       this.playingIndex = data.index
       this.playingFile = {
         filename: data.filename,
-        projectID: data.projectID
+        releaseID: data.releaseID
       }
     },
     setSelectedTrack(track) {
@@ -82,7 +78,7 @@ export const usePlayerStore = defineStore('player', {
       this.playing = playing
       this.onPause = false
       this.loading = false
-    },
+    }
   },
 
   getters: {
@@ -99,7 +95,4 @@ export const usePlayerStore = defineStore('player', {
       return state.selectedTrack
     }
   }
-
 })
-
-

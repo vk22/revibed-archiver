@@ -1,6 +1,6 @@
 <template>
   <div class="track-card-small" v-if="track">
-    <!-- <div class="track-player">
+    <div class="track-player">
       <div class="btn-audio pause" @click="pauseTrack(index)"
         v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title">
         <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +23,7 @@
           </g>
         </svg>
       </div>
-      <div class="btn-audio play" v-else>
+      <div class="btn-audio play" @click="selectAndPlay(track, index, track.title, rip.projectID)" v-else>
         <svg width="26px" height="32px" viewBox="0 0 26 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink">
           <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
@@ -37,25 +37,77 @@
           </g>
         </svg>
       </div>
-    </div> -->
+    </div>
 
     <div class="track-info">
-      <div class="mr-3">
-        {{ track.position }}.
-      </div>
+      <div class="mr-3"> {{ track.position }}. </div>
       <div class="track-trackname" @click="pauseTrack(index)">
         {{ track.title }}
       </div>
       <!-- <div class="track-info__r">
         <div class="track-duration">
-          {{ track.duration }}
+          {{ props.rip }}
         </div>
       </div> -->
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { usePlayerStore } from '@/renderer/store/player'
+const store = usePlayerStore()
+
+const props = defineProps(['track', 'index', 'rip'])
+const emit = defineEmits(['playtrack', 'pausetrack'])
+
+//// computed
+
+const playingIndex = computed(() => {
+  return store.playingIndex
+})
+const playing = computed(() => {
+  return store.playing
+})
+const playingFile = computed(() => {
+  return store.playingFile
+})
+const checkPause = computed(() => {
+  return store.onPause
+})
+const playlist = computed(() => {
+  return store.playlist
+})
+
+////
+
+const selectAndPlay = (track, index, title, releaseID) => {
+  selectTrack(track)
+  playTrack(index, title, releaseID)
+}
+
+const selectTrack = (track) => {
+  console.log('rip ', props.rip)
+  store.setSelectedTrack({
+    releaseID: props.rip.releaseID,
+    title: track.position + '. ' + track.title,
+    artist: props.rip.artist,
+    path: track.position + '. ' + track.title,
+    howl: null,
+    display: true
+  })
+}
+
+const playTrack = () => {
+  emit('playtrack')
+}
+
+const pauseTrack = () => {
+  emit('pausetrack')
+}
+</script>
+
+<!-- <script>
 export default {
   middleware: ['auth'],
   props: ['track', 'index', 'rip'],
@@ -101,10 +153,10 @@ export default {
     },
     selectTrack(track) {
       this.$store.commit('setSelectedTrack', {
-        projectID: this.rip.projectID,
-        projecFormat: this.rip.format,
+        projectID: rip.value.projectID,
+        projecFormat: rip.value.format,
         title: track.position + '. ' + track.title,
-        artist: this.rip.artist,
+        artist: rip.value.artist,
         path: track.position + '. ' + track.title,
         howl: null,
         display: true
@@ -186,7 +238,7 @@ export default {
   },
   watch: {}
 }
-</script>
+</script> -->
 
 <style lang="scss">
 @import '../assets/scss/main.scss';
@@ -265,7 +317,7 @@ export default {
 
   .track-player {
     cursor: pointer;
-    margin-right: 0.5rem;
+    margin-right: 0;
 
     .btn-audio {
       width: 40px;

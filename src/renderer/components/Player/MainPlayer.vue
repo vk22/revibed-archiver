@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { Howl, Howler } from "howler";
-import PlayerControlsBars from "./PlayerControlsBars.vue";
+import { Howl, Howler } from 'howler'
+import PlayerControlsBars from './PlayerControlsBars.vue'
 import { useMainStore } from '@/renderer/store/main'
 const store = useMainStore()
 
@@ -43,7 +43,7 @@ export default {
   components: {
     // PlayerTitleBar,
     // PlayerPlaylistPanel,
-    PlayerControlsBars,
+    PlayerControlsBars
     // PlayerInfoPanel,
     // PlayerSearchBar
   },
@@ -60,12 +60,12 @@ export default {
       playerIsActive: false,
       currentTrack: null,
       source: undefined,
-      player: undefined,
-    };
+      player: undefined
+    }
   },
   mounted() {
     //this.getPlaylist()
-    this.$store.commit("setPlayerActive", true);
+    this.$store.commit('setPlayerActive', true)
   },
   created() {
     // this.$nuxt.$on('stopPlayer', () => {
@@ -76,22 +76,22 @@ export default {
   methods: {
     getPlaylist() {
       //setTimeout(() => {
-      this.playlist = this.$store.state.player.playlist;
+      this.playlist = this.$store.state.player.playlist
     },
     // selectTrack (track) {
     //   this.selectedTrack = this.$store.getters['player/getSelectedTrack']
     // },
     play(index) {
-      console.log("play play play ", index);
+      console.log('play play play ', index)
 
-      const sourceNew = this.$store.state.player.source;
+      const sourceNew = this.$store.state.player.source
 
       if (!this.currentTrack) {
-        this.currentTrack = this.selectedTrack;
+        this.currentTrack = this.selectedTrack
       }
 
       if (this.source && this.source != sourceNew) {
-        this.stop();
+        this.stop()
       }
 
       // console.log("currentTrack", this.currentTrack.path);
@@ -100,147 +100,147 @@ export default {
 
       let selectedTrackIndex = this.playlist.findIndex(
         (track) => track.path === this.selectedTrack.path
-      );
+      )
       let currentTrackIndex = this.playlist.findIndex(
         (track) => track.path === this.currentTrack.path
-      );
+      )
 
       console.log(
-        "index selectedTrackIndex currentTrackIndex",
+        'index selectedTrackIndex currentTrackIndex',
         index,
         selectedTrackIndex,
         currentTrackIndex
-      );
+      )
 
       if (!index) {
         if (this.selectedTrack) {
           if (this.selectedTrack.path !== this.currentTrack.path) {
-            this.stop();
+            this.stop()
           }
-          index = selectedTrackIndex;
+          index = selectedTrackIndex
         }
       }
-      if (typeof index !== "number") {
-        index = this.index;
+      if (typeof index !== 'number') {
+        index = this.index
       }
 
-      console.log("играем ", index);
-      let track = this.playlist[index];
-      console.log("track ", track);
-      let trackPath = "";
+      console.log('играем ', index)
+      let track = this.playlist[index]
+      console.log('track ', track)
+      let trackPath = ''
 
-      if (sourceNew == "tracks") {
+      if (sourceNew == 'tracks') {
         // var src = [`/uploads/${this.$auth.user.id}/buffer/${track.path}`]
-        if (track.projecFormat == "CD") {
-          trackPath = `file://${this.ripsStoreURL}/${track.projectID}/AUDIO/${track.path}.flac`;
+        if (track.projecFormat == 'CD') {
+          trackPath = `file://${this.ripsStoreURL}/${track.projectID}/AUDIO/${track.path}.flac`
         } else {
-          trackPath = `file://${this.ripsStoreURL}/${track.projectID}/RESTORED/${track.path}.flac`;
+          trackPath = `file://${this.ripsStoreURL}/${track.projectID}/RESTORED/${track.path}.flac`
         }
-      } else if (sourceNew == "stream") {
-        trackPath = `/stream/audio/${track.path}.mp3`;
+      } else if (sourceNew == 'stream') {
+        trackPath = `/stream/audio/${track.path}.mp3`
       }
 
       if (track.howl) {
-        this.player = track.howl;
+        this.player = track.howl
       } else {
         this.player = track.howl = new Howl({
           src: [trackPath],
           html5: true,
           onend: () => {
             if (this.loop) {
-              this.play(this.index);
+              this.play(this.index)
             } else {
-              this.skip("next");
+              this.skip('next')
             }
           },
           onplay: () => {
             //console.log('onplay ', this.playerIsActive)
-            if (this.playlistSource == "stream") {
-              this.waitingMusic = false;
+            if (this.playlistSource == 'stream') {
+              this.waitingMusic = false
             }
-            this.$store.commit("setPlaying", true);
+            this.$store.commit('setPlaying', true)
             // this.playerIsActive = true;
-          },
-        });
+          }
+        })
       }
 
       //console.log('this.player', this.player)
-      this.player.play();
-      this.selectedTrack = this.playlist[index];
-      this.currentTrack = this.playlist[index];
-      this.index = index;
-      this.playerIsActive = true;
-      this.playing = true;
-      this.source = sourceNew;
-      if (this.playlistSource == "stream") {
-        this.waitingMusic = true;
+      this.player.play()
+      this.selectedTrack = this.playlist[index]
+      this.currentTrack = this.playlist[index]
+      this.index = index
+      this.playerIsActive = true
+      this.playing = true
+      this.source = sourceNew
+      if (this.playlistSource == 'stream') {
+        this.waitingMusic = true
       }
 
       //console.log('playing ', this.playing, this.selectedTrack)
       var playingTrack = {
         index: index,
         filename: this.currentTrack.path,
-        projectID: this.currentTrack.projectID,
-      };
+        projectID: this.currentTrack.projectID
+      }
 
-      this.$store.commit("setPlayingIndex", playingTrack);
+      this.$store.commit('setPlayingIndex', playingTrack)
       // this.$store.commit('setPlayerActive', true)
     },
     pause() {
-      console.log("pause", this.currentTrack.title);
-      this.currentTrack.howl.pause();
-      this.playing = false;
+      console.log('pause', this.currentTrack.title)
+      this.currentTrack.howl.pause()
+      this.playing = false
     },
     stop() {
       //console.log('stop ', this.currentTrack.howl.playing())
       //this.playlist[index].howl.stop()
-      this.currentTrack.howl.unload();
-      Howler.unload();
-      this.playing = false;
+      this.currentTrack.howl.unload()
+      Howler.unload()
+      this.playing = false
       //this.$store.commit('player/setPlaying', false)
     },
     skip(direction) {
       let index = 0,
-        lastIndex = this.playlist.length - 1;
+        lastIndex = this.playlist.length - 1
 
       if (this.shuffle) {
-        index = Math.round(Math.random() * lastIndex);
+        index = Math.round(Math.random() * lastIndex)
         while (index === this.index) {
-          index = Math.round(Math.random() * lastIndex);
+          index = Math.round(Math.random() * lastIndex)
         }
-      } else if (direction === "next") {
-        index = this.index + 1;
+      } else if (direction === 'next') {
+        index = this.index + 1
         if (index >= this.playlist.length) {
-          index = 0;
+          index = 0
         }
       } else {
-        index = this.index - 1;
+        index = this.index - 1
         if (index < 0) {
-          index = this.playlist.length - 1;
+          index = this.playlist.length - 1
         }
       }
-      console.log("skipTo ", index);
-      this.skipTo(index);
+      console.log('skipTo ', index)
+      this.skipTo(index)
     },
     skipTo(index) {
       if (this.currentTrack) {
-        this.currentTrack.howl.stop();
+        this.currentTrack.howl.stop()
       }
-      this.play(index);
+      this.play(index)
     },
     toggleLoop(value) {
-      this.loop = value;
+      this.loop = value
     },
     toggleShuffle(value) {
-      this.shuffle = value;
+      this.shuffle = value
     },
     setSeek(percents) {
-      let track = this.currentTrack.howl;
+      let track = this.currentTrack.howl
 
       if (track.playing()) {
-        track.seek((track.duration() / 100) * percents);
+        track.seek((track.duration() / 100) * percents)
       }
-    },
+    }
     // initPlayer() {
     //   this.play(this.$store.state.player.playingIndex)
     // },
@@ -251,18 +251,18 @@ export default {
     // },
     selectedTrack: {
       get() {
-        return this.$store.state.player.selectedTrack;
+        return this.$store.state.player.selectedTrack
       },
-      set() {},
+      set() {}
     },
     progress() {
       //console.log('this.currentTrack ', this.currentTrack)
       if (this.currentTrack) {
-        if (this.currentTrack.howl.duration() === 0) return 0;
+        if (this.currentTrack.howl.duration() === 0) return 0
         //console.log('progress ', this.seek / this.currentTrack.howl.duration())
-        return this.seek / this.currentTrack.howl.duration();
+        return this.seek / this.currentTrack.howl.duration()
       } else {
-        return 0;
+        return 0
       }
     },
     getTrackInfo() {
@@ -271,63 +271,63 @@ export default {
         let artist = this.currentTrack.artist,
           title = this.currentTrack.title,
           seek = this.seek,
-          duration = this.currentTrack.howl.duration();
+          duration = this.currentTrack.howl.duration()
         return {
           artist,
           title,
           seek,
-          duration,
-        };
+          duration
+        }
       } else {
         return {
-          artist: "",
-          title: "",
+          artist: '',
+          title: '',
           seek: 0,
-          duration: 0,
-        };
+          duration: 0
+        }
       }
     },
     initPlay() {
-      return this.$store.state.player.initPlay;
+      return this.$store.state.player.initPlay
     },
     checkPause() {
-      return this.$store.state.player.onPause;
+      return this.$store.state.player.onPause
     },
     playlistSource() {
-      return this.$store.state.source;
+      return this.$store.state.source
     },
     ripsStoreURL() {
-      return this.$store.getters.getFilesPath;
-    },
+      return this.$store.getters.getFilesPath
+    }
   },
   watch: {
     playing(playing) {
-      this.seek = this.currentTrack.howl.seek();
-      let updateSeek;
+      this.seek = this.currentTrack.howl.seek()
+      let updateSeek
       if (playing) {
         updateSeek = setInterval(() => {
-          this.seek = this.currentTrack.howl.seek();
+          this.seek = this.currentTrack.howl.seek()
           //console.log('this.seek ', this.seek)
-        }, 250);
+        }, 250)
       } else {
-        clearInterval(updateSeek);
+        clearInterval(updateSeek)
       }
     },
     initPlay(newCount, oldCount) {
-      console.log("initPlay ", newCount, oldCount);
+      console.log('initPlay ', newCount, oldCount)
       if (newCount) {
-        this.getPlaylist();
-        this.play();
-        this.$store.commit("initPlay", false);
+        this.getPlaylist()
+        this.play()
+        this.$store.commit('initPlay', false)
       } else {
         //this.stop()
       }
     },
     checkPause(newCount) {
       if (newCount) {
-        this.pause();
+        this.pause()
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>

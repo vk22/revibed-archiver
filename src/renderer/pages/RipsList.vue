@@ -38,7 +38,7 @@
           density="compact" :hide-default-footer="true" show-select item-value="_id" items-per-page="200">
           <template v-slot:item.title="{ item }">
             <router-link :to="{ name: 'RipPage', params: { id: item.releaseID } }">
-              {{ item.title }} {{ item.releaseID }}
+              {{ item.title }}
             </router-link>
           </template>
           <template v-slot:item.updated="{ item }">
@@ -151,9 +151,9 @@ const onRevibedCount = computed(() => {
 
 /// data
 const headers = ref([
-  { key: 'releaseID', title: 'Discogs Release' },
   { key: 'title', title: 'Title' },
   { key: 'artist', title: 'Artist' },
+  { key: 'releaseID', title: 'Discogs Release' },
   { key: 'source', title: 'Source' },
   { key: 'youtubeVideoID', title: 'Youtube Link' },
   { key: 'onRevibed', title: 'Revibed' },

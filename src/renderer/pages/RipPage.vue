@@ -5,16 +5,12 @@
         <div @click="goToPrev()"><v-icon>mdi-chevron-left</v-icon> Back</div>
       </div>
       <div class="rip-inner__top">
-        <!-- {{ ripCover }} -->
         <div class="cover">
-          <img :src="ripCover" @error="imageLoadError">
-          <!-- <img :src="'file://' + storageFolder + '/' + rip.releaseID + '/VISUAL/A.jpg'"
-            v-if="storageFolder + '/' + rip.releaseID + '/VISUAL/A.jpg'"> -->
-
+          <img :src="ripCover" @error="imageLoadError" />
         </div>
-        <div class="details position-center-wrapper ">
+        <div class="details position-center-wrapper">
           <div class="rip-info">
-            <div class="mb-3">
+            <div class="mb-5">
               <div class="artist">
                 {{ rip.artist }}
               </div>
@@ -22,19 +18,19 @@
                 {{ rip.title }}
               </div>
             </div>
-            <div class="tags mb-5">
-              <div class="tag2" v-if="rip.country && rip.country != '---'">{{ rip.country }}</div>
-              <div class="tag2" v-if="rip.year && rip.year != '---'">, {{ rip.year }}</div>
-            </div>
             <div class="tags">
-              <div class="tag" v-for="(tag, index) in rip.style" :key="index">
+              <div class="tag" v-for="(tag, index) in rip.allstyles" :key="index">
                 {{ tag }}
               </div>
             </div>
-            <div class="mt-5">
-              Discogs release: {{ rip.releaseID }}
-            </div>
-            <br>
+            <div class="mt-4"><b>Discogs release:</b> {{ rip.releaseID }} </div>
+            <div class="mt-1"><b>Label:</b> {{ rip.labelName }} </div>
+            <div class="mt-1"><b>Country:</b> {{ rip.country }} </div>
+            <div class="mt-1" v-if="rip.year"><b>Year:</b> {{ rip.year }} </div>
+            <div class="mt-1"><b>Source:</b> {{ rip.source }} </div>
+            <div class="mt-1"><b>Quality:</b> {{ rip.quality }} </div>
+            <div class="mt-1" v-if="rip.onRevibed.forSale"><b>On Revibed:</b> {{ rip.onRevibed.id }} </div>
+            <br />
           </div>
           <!-- <div class="tools-btns">
 
@@ -67,26 +63,18 @@
 
 </div> -->
         </div>
-
       </div>
       <div class="rip-inner__bottom">
-
-
-
         <div class="tracklist">
-          <TracksOneTrack :track="track" :rip="rip" v-for="(track, index) in tracks" :key="index">
+          <TracksOneTrack :track="track" :rip="rip" v-for="(track, index) in tracks" :key="index"
+            :class="{ playing: playingFile == track.position + '. ' + track.title }" :index="index"
+            @playtrack="play(index, track.title, track.projectID)" @pausetrack="pause(index)">
           </TracksOneTrack>
         </div>
-
       </div>
       <v-row>
-        <v-col>
-
-
-
-        </v-col>
+        <v-col> </v-col>
       </v-row>
-
     </div>
   </div>
 </template>
@@ -96,14 +84,15 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import TracksOneTrack from '@/renderer/components/TracksOneTrack.vue'
 import { useMainStore } from '@/renderer/store/main'
-const store = useMainStore()
+import { usePlayerStore } from '@/renderer/store/player'
+const storePlayer = usePlayerStore()
+const storeMain = useMainStore()
 const route = useRoute()
 const router = useRouter()
 
 function goToPrev() {
-  router.go(-1);
+  router.go(-1)
 }
-
 
 const formatDateEn = (date) => {
   //console.log('formatDate locale ', state.locale)
@@ -129,27 +118,59 @@ const formatDateEn = (date) => {
 }
 const ripCover = ref()
 const rip = computed(() => {
-  const rip = store.getReleaseOne(route.params.id)
+  const rip = storeMain.getReleaseOne(route.params.id)
   if (rip) {
+    rip.allstyles = rip.genres.concat(rip.styles);
     ripCover.value = 'file://' + storageFolder.value + '/' + rip.releaseID + '/VISUAL/Front.jpg'
   }
+
   return rip
 })
 const tracks = computed(() => {
-  return store.getReleaseTracks(rip.value.releaseID)
+  return storeMain.getReleaseTracks(rip.value.releaseID)
 })
 const storageFolder = computed(() => {
-  return store.getStorageFolder
+  return storeMain.getStorageFolder
 })
-
-
-
-console.log('rip ', rip)
 
 function imageLoadError() {
   // alert('Image failed to load');
   ripCover.value = 'file://' + storageFolder.value + '/' + rip.value.releaseID + '/VISUAL/A.jpg'
-  // 
+  //
+}
+
+const play = (index, filename) => {
+  const playlist = {
+    source: 'tracks',
+    tracks: []
+  }
+  const play = {
+    index: index,
+    filename: filename,
+    releaseID: rip.value.releaseID
+  }
+  tracks.value.forEach((track) => {
+    playlist.tracks.push({
+      releaseID: rip.value.releaseID,
+      title: track.position + '. ' + track.title,
+      artist: rip.value.artist,
+      path: track.position + '. ' + track.title,
+      howl: null,
+      display: true
+    })
+  })
+  storePlayer.setPlaylist(playlist)
+  storePlayer.play(play)
+  // this.$store.commit('setPlaylist', playlist)
+  // this.$store.commit('play', play)
+}
+
+const playingFile = () => {
+  storePlayer.playingFile
+}
+
+const pause = (index) => {
+  storePlayer.pause(index)
 }
 
 watch(ripCover, (newValue, oldValue) => {
@@ -275,7 +296,7 @@ export default {
 </script> -->
 
 <style lang="scss">
-@import "../assets/scss/main.scss";
+@import '../assets/scss/main.scss';
 
 .rip-inner {
   max-width: 100%;
@@ -285,16 +306,15 @@ export default {
   transition: opacity 0.5s ease;
 
   &.loading {
-    opacity: .5;
+    opacity: 0.5;
   }
-
 
   .backBtn {
     margin-bottom: 1rem;
     margin-left: -0.5rem;
     font-weight: 600;
     cursor: pointer;
-    opacity: .5;
+    opacity: 0.5;
 
     &:hover {
       text-decoration: none;
@@ -312,7 +332,6 @@ export default {
     width: 40%;
     max-width: 300px;
     margin-right: 2rem;
-
 
     img {
       width: 100%;
@@ -335,35 +354,33 @@ export default {
     margin-bottom: 1rem;
 
     .artist {
-      font-size: 2rem;
-      line-height: 2rem;
+      font-size: 1.75rem;
+      line-height: 1.75rem;
       font-weight: 600;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     .album {
-      font-size: 2rem;
-      line-height: 2rem;
+      font-size: 1.75rem;
+      line-height: 1.75rem;
       margin-bottom: 1rem;
     }
-
 
     .tags {
       display: flex;
       flex-wrap: wrap;
-      margin-top: .5rem;
 
       .tag {
-        background: #f1f1f1;
+        font-size: 0.85rem;
+        background: #e8e8e8;
         color: #333;
-        padding: 0.5rem 0.75rem 0.5rem;
-        border-radius: 35px;
+        padding: 0.35rem 0.5rem 0.35rem;
+        border-radius: 4px;
         margin-right: 0.25rem;
         margin-bottom: 0.25rem;
         line-height: 1;
       }
     }
-
   }
 
   .tools-btns {
@@ -371,7 +388,7 @@ export default {
 
     &>* {
       // flex: 1 1 auto;
-      margin-right: .25rem;
+      margin-right: 0.25rem;
     }
   }
 }

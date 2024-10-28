@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { isProxy, toRaw } from 'vue';
+import { isProxy, toRaw } from 'vue'
 
 //const API_URL_LABELS = 'http://localhost:3000';
 const API_URL_LABELS = 'http://labels.kx-streams.com/api'
@@ -82,7 +82,7 @@ export const useMainStore = defineStore('main', {
   }),
   actions: {
     setLoading(data) {
-      if (data.finish) playSound()
+      if (data.finish) showNotification(data.message)
       this.loading = data.state
     },
     setFolderPath(path) {
@@ -165,7 +165,6 @@ export const useMainStore = defineStore('main', {
       if (getTracksData.data.success) {
         this.tracks = getTracksData.data.tracks
       }
-
     },
     setRevibedGoods(data) {
       console.log('setRevibedGoods ', data.length)
@@ -237,21 +236,6 @@ export const useMainStore = defineStore('main', {
       this.onYoutubeCount = data.onYoutubeCount
       this.countries = data.countries
     },
-    // async updateReleasesDB() {
-    //   const { data } = await axios.post(`http://localhost:8000/api/update-revibed/`, {
-    //     releases: this.allReleases
-    //   })
-    //   console.log('data ', data)
-    // },
-    // async cc() {
-    //   const dataParsed = JSON.parse(JSON.stringify(data))
-    //   return new Promise((resolve, reject) => {
-    //     window.mainApi.invoke('getUserLocalData', dataParsed).then((result) => {
-    //       console.log('AuthService result ', result)
-    //       resolve(result)
-    //     })
-    //   })
-    // },
     async checkDropedFolder() {
       console.log('checkDropedFolder Store')
       this.setLoading({ state: true })
@@ -264,18 +248,6 @@ export const useMainStore = defineStore('main', {
       }
       this.setLoading({ state: false, finish: false })
     },
-    // async checkDropedFolder() {
-    //   console.log('checkDropedFolder Store')
-    //   this.setLoading({ state: true })
-    //   const { data } = await axios.post(`http://localhost:8000/api/check-droped-folder/`, {
-    //     folder: this.folderPath
-    //   })
-    //   console.log('checkDropedFolder response ', data)
-    //   if (data.success) {
-    //     this.setDropedData(data)
-    //   }
-    //   this.setLoading({ state: false, finish: false })
-    // },
     setDropedData(data) {
       console.log('setDropedData')
       this.folderDropped = true
@@ -316,6 +288,7 @@ export const useMainStore = defineStore('main', {
       }
     },
     async downloadDiscogsImages() {
+      this.setLoading({ state: true })
       const response = await window.mainApi.invoke('downloadDiscogsImages', {
         folder: this.folderPath
       })
@@ -324,6 +297,7 @@ export const useMainStore = defineStore('main', {
       if (response.success) {
         this.discogsImages = response.images
         await this.getFilesFromFolder()
+        this.setLoading({ state: false, finish: false })
       }
     },
     async parseDiscogs(releaseID) {
@@ -409,7 +383,7 @@ export const useMainStore = defineStore('main', {
       // })
       console.log('archiveProject ', response)
       if (response.success) {
-        this.setLoading({ state: false, finish: true })
+        this.setLoading({ state: false, finish: true, message: { title: 'Archive has been ready', body: 'You have to move it to storage folder' } })
         this.$reset
       }
     },
@@ -517,7 +491,7 @@ export const useMainStore = defineStore('main', {
         releases: releasesParced
       })
       console.log('exportReleasesToRVBD response: ', response)
-      this.setLoading({ state: false, finish: true })
+      this.setLoading({ state: false, finish: true, message: { title: 'Archives for upload is ready', body: 'You can start upload' } })
     },
     async exportReleasesToYoutube(releases) {
       this.setLoading({ state: true })
@@ -531,7 +505,7 @@ export const useMainStore = defineStore('main', {
         releases: releasesParced
       })
       console.log('exportReleasesToYoutube response: ', response)
-      this.setLoading({ state: false, finish: true })
+      this.setLoading({ state: false, finish: true, message: { title: 'Export of releases to Youtube is complete', body: 'You can start upload' } })
     }
   },
   getters: {
@@ -539,7 +513,7 @@ export const useMainStore = defineStore('main', {
       return state.allReleases
     },
     getReleases: (state) => {
-      console.log('getReleases store', state.releases)
+      //console.log('getReleases store', state.releases)
       let filters = [...state.filterState]
       console.log('getReleases filters ', filters)
       if (filters.length) {
@@ -617,11 +591,11 @@ export const useMainStore = defineStore('main', {
     getStorageFolder: (state) => {
       return state.storageFolder
     },
-    getReleaseOne: state => (id) => {
+    getReleaseOne: (state) => (id) => {
       // console.log('getReleaseOne ', state.releases)
       const releases = toRaw(state.releases)
       const storageFolder = toRaw(state.storageFolder)
-      const release = releases.find(item => item.releaseID === +id)
+      const release = releases.find((item) => item.releaseID === +id)
 
       if (release) {
         const localPath = `${storageFolder}/${release.releaseID}`
@@ -629,12 +603,11 @@ export const useMainStore = defineStore('main', {
         console.log('storageFolder localPath', localPath)
         return release
       }
-
     },
-    getReleaseTracks: state => (id) => {
+    getReleaseTracks: (state) => (id) => {
       console.log('getReleaseTracks ', id)
       if (state.tracks.length) {
-        return state.tracks.filter(item => item.releaseID === id).reverse()
+        return state.tracks.filter((item) => item.releaseID === id).reverse()
       }
     },
     getFilesPath: (state) => {
@@ -689,12 +662,16 @@ export const useMainStore = defineStore('main', {
     }
   }
 })
+import soundFinish from '../assets/sound/finish2.mp3'
 
-function playSound() {
-  const audio = new Audio(
-    'file:////Users/kushnir/Works/revibed-archiver/src/renderer/assets/sound/finish2.mp3'
-  )
-  audio.play()
+function showNotification(message) {
+  console.log('showNotification ', message)
+  new Notification(message.title, {
+    body: message.body,
+    icon: 'icon.png',
+    silent: true // notification is silent - no sounds or vibrations issued
+  })
+  new Audio(soundFinish).play()
 }
 
 function removeDublikatesAndCount(original) {
