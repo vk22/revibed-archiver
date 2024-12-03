@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 const API_URL = 'http://localhost:3000'
-//const API_URL = 'http://labels.kx-streams.com/api';
+//const API_URL = 'https://tools.revibed.com/api';
 
 export const useFilterStore = defineStore('filter', {
   state: {
@@ -285,7 +285,7 @@ export const useFilterStore = defineStore('filter', {
     async exportLabels({ state, commit }, labels) {
       console.log('exportLabels ', labels)
       const { data } = await axios.post(
-        'http://labels.kx-streams.com/api/export-labels/',
+        'https://tools.revibed.com/api/export-labels/',
         { labels: labels },
         { responseType: 'arraybuffer' }
       )

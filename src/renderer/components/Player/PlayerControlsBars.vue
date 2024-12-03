@@ -186,12 +186,12 @@
         :color="'#222'"
         :track-color="'#222'"
         v-model="volume"
-        @input="updateVolume(volume)"
+        @update:modelValue="updateVolume(volume)"
         max="1"
         step="0.1"
       >
       </v-slider>
-      <!-- {{ this.volume * 100 + '%' }} -->
+      <!-- {{ volume * 100 + '%' }} -->
     </div>
   </div>
 </template>
@@ -230,6 +230,7 @@ const skipTrack = (direction) => {
   emit('skiptrack', direction)
 }
 const updateVolume = (volume) => {
+  // console.log('volume ', volume)
   Howler.volume(volume)
 }
 const toggleMute = (volume) => {

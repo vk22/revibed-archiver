@@ -106,12 +106,13 @@ body {
 }
 
 a {
-  color: #111;
+  color: #333;
   text-decoration: none;
   background-color: transparent;
 
   &:hover {
-    color: #0b00b1;
+    color: #222;
+    text-decoration: underline;
   }
 }
 

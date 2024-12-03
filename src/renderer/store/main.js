@@ -3,7 +3,7 @@ import axios from 'axios'
 import { isProxy, toRaw } from 'vue'
 
 //const API_URL_LABELS = 'http://localhost:3000';
-const API_URL_LABELS = 'http://labels.kx-streams.com/api'
+const API_URL_LABELS = 'https://tools.revibed.com/api'
 const API_URL_REVIBED = 'https://system-api.revibed.com'
 const tokenRvbd = 'ozs6tZrfHNCSS4HnfRPvpvgVGbBj2JakfPyEXAtJcXukGNxCouBW2Gs6z7STZEfVyh4Tmg'
 
@@ -383,7 +383,14 @@ export const useMainStore = defineStore('main', {
       // })
       console.log('archiveProject ', response)
       if (response.success) {
-        this.setLoading({ state: false, finish: true, message: { title: 'Archive has been ready', body: 'You have to move it to storage folder' } })
+        this.setLoading({
+          state: false,
+          finish: true,
+          message: {
+            title: 'Archive has been ready',
+            body: 'You have to move it to storage folder'
+          }
+        })
         this.$reset
       }
     },
@@ -491,7 +498,11 @@ export const useMainStore = defineStore('main', {
         releases: releasesParced
       })
       console.log('exportReleasesToRVBD response: ', response)
-      this.setLoading({ state: false, finish: true, message: { title: 'Archives for upload is ready', body: 'You can start upload' } })
+      this.setLoading({
+        state: false,
+        finish: true,
+        message: { title: 'Archives for upload is ready', body: 'You can start upload' }
+      })
     },
     async exportReleasesToYoutube(releases) {
       this.setLoading({ state: true })
@@ -505,7 +516,14 @@ export const useMainStore = defineStore('main', {
         releases: releasesParced
       })
       console.log('exportReleasesToYoutube response: ', response)
-      this.setLoading({ state: false, finish: true, message: { title: 'Export of releases to Youtube is complete', body: 'You can start upload' } })
+      this.setLoading({
+        state: false,
+        finish: true,
+        message: {
+          title: 'Export of releases to Youtube is complete',
+          body: 'You can start upload'
+        }
+      })
     }
   },
   getters: {

@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 //const API_URL_LABELS = 'http://localhost:3000/auth'
-const API_URL_LABELS = 'http://labels.kx-streams.com/api/auth/'
+const API_URL_LABELS = 'https://tools.revibed.com/api/auth/'
 // const API_URL = 'http://localhost:8000/api'
-//const API_URL = 'http://labels.kx-streams.com/api/auth/'
+//const API_URL = 'https://tools.revibed.com/api/auth/'
 
 class AuthService {
   login(user) {

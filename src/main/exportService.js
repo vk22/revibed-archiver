@@ -199,7 +199,9 @@ class ExportService {
       const ripData = releases[i]
       const source = ripData.source
       const releaseID = ripData.releaseID
-      const condition = ripData.condition
+      const condition = ripData.sourceCondition
+      const quality = ripData.quality
+      const from_editor = ripData.source === 'Anton' ? true : false
       fileID = releaseID
 
       const exportFolderItem = `${exportFolder}`
@@ -244,9 +246,9 @@ class ExportService {
         let itemData = {
           file_id: fileID.toString(),
           discogs_release_id: releaseID,
-          condition_id: conditionData[condition],
+          quality: quality,
           condition: condition,
-          from_editor: true
+          from_editor: from_editor
         }
         finalData.push(itemData)
       } else {

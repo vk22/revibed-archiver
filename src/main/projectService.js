@@ -57,6 +57,7 @@ class ProjectService {
       source: owner,
       sourceCondition: condition,
       quality: quality,
+      type: owner === 'Revibed' ? 'coming_soon' : 'goods',
       updated: Date.now()
     }
     const headers = {
@@ -66,7 +67,7 @@ class ProjectService {
     }
     console.log('sendToRevibed project', project)
     try {
-      const response = await axios.post(`http://labels.kx-streams.com/api/add-release`, project, {
+      const response = await axios.post(`https://tools.revibed.com/api/add-release`, project, {
         headers: headers
       })
       return response.data

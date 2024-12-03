@@ -11,11 +11,11 @@
         <div class="details position-center-wrapper">
           <div class="rip-info">
             <div class="mb-5">
-              <div class="artist">
-                {{ rip.artist }}
-              </div>
               <div class="album">
                 {{ rip.title }}
+              </div>
+              <div class="artist">
+                {{ rip.artist }}
               </div>
             </div>
             <div class="tags">
@@ -29,7 +29,16 @@
             <div class="mt-1" v-if="rip.year"><b>Year:</b> {{ rip.year }} </div>
             <div class="mt-1"><b>Source:</b> {{ rip.source }} </div>
             <div class="mt-1"><b>Quality:</b> {{ rip.quality }} </div>
-            <div class="mt-1" v-if="rip.onRevibed.forSale"><b>On Revibed:</b> {{ rip.onRevibed.id }} </div>
+            <div class="mt-1" v-if="rip.onRevibed.forSale"
+              ><b>On Revibed:</b>
+              <a
+                :href="` https://revibed.com/marketplace/${rip.onRevibed.id}`"
+                class="table-item__youtubeLink"
+                v-if="rip.onRevibed.forSale"
+                target="_blank"
+                >{{ rip.onRevibed.id }}</a
+              >
+            </div>
             <br />
           </div>
           <!-- <div class="tools-btns">
@@ -66,9 +75,16 @@
       </div>
       <div class="rip-inner__bottom">
         <div class="tracklist">
-          <TracksOneTrack :track="track" :rip="rip" v-for="(track, index) in tracks" :key="index"
-            :class="{ playing: playingFile == track.position + '. ' + track.title }" :index="index"
-            @playtrack="play(index, track.title, track.projectID)" @pausetrack="pause(index)">
+          <TracksOneTrack
+            :track="track"
+            :rip="rip"
+            v-for="(track, index) in tracks"
+            :key="index"
+            :class="{ playing: playingFile == track.position + '. ' + track.title }"
+            :index="index"
+            @playtrack="play(index, track.title, track.projectID)"
+            @pausetrack="pause(index)"
+          >
           </TracksOneTrack>
         </div>
       </div>
@@ -120,7 +136,7 @@ const ripCover = ref()
 const rip = computed(() => {
   const rip = storeMain.getReleaseOne(route.params.id)
   if (rip) {
-    rip.allstyles = rip.genres.concat(rip.styles);
+    rip.allstyles = rip.genres.concat(rip.styles)
     ripCover.value = 'file://' + storageFolder.value + '/' + rip.releaseID + '/VISUAL/Front.jpg'
   }
 
@@ -177,7 +193,7 @@ watch(ripCover, (newValue, oldValue) => {
   console.log(`watch: selected changed from ${oldValue} to ${newValue}`)
 })
 
-onMounted(() => { })
+onMounted(() => {})
 </script>
 
 <!-- <script>
@@ -352,18 +368,19 @@ export default {
 
   .rip-info {
     margin-bottom: 1rem;
+    padding-top: 1rem;
 
     .artist {
       font-size: 1.75rem;
       line-height: 1.75rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .album {
       font-size: 1.75rem;
       line-height: 1.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     .tags {
@@ -386,7 +403,7 @@ export default {
   .tools-btns {
     display: flex;
 
-    &>* {
+    & > * {
       // flex: 1 1 auto;
       margin-right: 0.25rem;
     }

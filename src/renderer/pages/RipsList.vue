@@ -1,13 +1,18 @@
 <template>
-  <v-container fluid class="pa-0" v-if="ripsList">
+  <v-container fluid class="pa-0">
     <div class="releases-filters-tool">
       <v-row>
         <v-col>
           <FilterReleases></FilterReleases>
-          <button class="btn mr-2" @click="addToRVBD()" :class="{ disable: selected.length === 0 }">Add to
-            Revibed</button>
-          <button class="btn mr-2" @click="addToYoutube()" :class="{ disable: selected.length === 0 }">Add to
-            Youtube</button>
+          <button class="btn mr-2" @click="addToRVBD()" :class="{ disable: selected.length === 0 }"
+            >Add to Revibed</button
+          >
+          <button
+            class="btn mr-2"
+            @click="addToYoutube()"
+            :class="{ disable: selected.length === 0 }"
+            >Add to Youtube</button
+          >
         </v-col>
         <v-col class="d-flex align-center">
           <div class="stats-block">
@@ -27,15 +32,50 @@
         </v-col>
       </v-row>
     </div>
-    <v-row v-if="Object.keys(ripsList).length" class="releases-list" ref="rips" v-on:scroll="handleScroll()">
+    <v-row
+      v-if="Object.keys(ripsList).length"
+      class="releases-list"
+      ref="rips"
+      v-on:scroll="handleScroll()"
+    >
       <v-col md="12">
         <div class="search-container">
-          <v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" single-line variant="outlined"
-            hide-details density="compact"></v-text-field>
+          <v-text-field
+            v-model="search"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            variant="outlined"
+            hide-details
+            density="compact"
+          ></v-text-field>
         </div>
 
-        <v-data-table v-model="selected" :headers="headers" :items="ripsList" :search="search" :single-select="true"
-          density="compact" :hide-default-footer="true" show-select item-value="_id" items-per-page="200">
+        <v-data-table
+          v-model="selected"
+          :headers="headers"
+          :items="ripsList"
+          :search="search"
+          :single-select="true"
+          density="compact"
+          :hide-default-footer="true"
+          show-select
+          item-value="_id"
+          items-per-page="100"
+        >
+          <template v-slot:item.cover="{ item }">
+            <router-link :to="{ name: 'RipPage', params: { id: item.releaseID } }">
+              <img
+                :src="'file://' + storageFolder + '/' + item.releaseID + '/VISUAL/Front.jpg'"
+                @error="
+                  $event.target.src =
+                    'file://' + storageFolder + '/' + item.releaseID + '/VISUAL/A.jpg'
+                "
+                class="cover-img"
+              />
+            </router-link>
+          </template>
+
           <template v-slot:item.title="{ item }">
             <router-link :to="{ name: 'RipPage', params: { id: item.releaseID } }">
               {{ item.title }}
@@ -45,42 +85,25 @@
             {{ formatDateEn(item.updated) }}
           </template>
           <template v-slot:item.onRevibed="{ item }">
-            <a :href="` https://revibed.com/marketplace/${item.onRevibed.id}`" class="table-item__youtubeLink"
-              v-if="item.onRevibed.forSale" target="_blank">{{ item.onRevibed.id }}</a>
+            <a
+              :href="` https://revibed.com/marketplace/${item.onRevibed.id}`"
+              class="table-item__youtubeLink"
+              v-if="item.onRevibed.forSale"
+              target="_blank"
+              >{{ item.onRevibed.id }}</a
+            >
             <span v-else class="grey">
               {{ item.onRevibed.id }}
             </span>
           </template>
         </v-data-table>
-
-        <!-- <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left"> title </th>
-                <th class="text-left"> releaseID </th>
-                <th class="text-left"> labelName </th>
-                <th class="text-left"> labelID </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(rip, index) in ripsList" :key="index">
-                <td>{{ rip.title }}</td>
-                <td>{{ rip.releaseID }}</td>
-                <td>{{ rip.labelName }}</td>
-                <td>{{ rip.labelID }}</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table> -->
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col>
-        <!-- <v-progress-circular
-          indeterminate
-          color="primary"
-        ></v-progress-circular> -->
+      <v-col class="loading-screen-container">
+        <div class="loading-screen">
+          <v-progress-circular color="black" indeterminate rounded height="6"></v-progress-circular>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -95,6 +118,10 @@ const store = useMainStore()
 
 const ripsList = computed(() => {
   return store.getReleases
+})
+
+const storageFolder = computed(() => {
+  return store.getStorageFolder
 })
 
 const selected = ref([])
@@ -151,6 +178,7 @@ const onRevibedCount = computed(() => {
 
 /// data
 const headers = ref([
+  { key: 'cover', title: 'Cover' },
   { key: 'title', title: 'Title' },
   { key: 'artist', title: 'Artist' },
   { key: 'releaseID', title: 'Discogs Release' },
@@ -161,14 +189,46 @@ const headers = ref([
   // { text: "Errors", value: "errors", sortable: false },
 ])
 
-onMounted(() => { })
+onMounted(() => {})
 </script>
 
 <style lang="scss">
 @import '../assets/scss/main.scss';
 
+.loading-screen-container {
+  position: relative;
+}
+
+.loading-screen {
+  position: absolute;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  margin: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  color: #fff;
+  border-radius: 0;
+  padding-top: 25%;
+
+  .v-progress-circular {
+    color: mediumvioletred;
+  }
+
+  &.success-message {
+    background: #ccffe58c;
+  }
+
+  p {
+    margin-bottom: 0px !important;
+  }
+}
+
 .releases-list {
-  padding: 0rem;
+  padding-bottom: 4rem;
 }
 
 .releases-filters-tool {
@@ -205,5 +265,12 @@ table thead {
 .grey {
   color: #c1c1c1;
 }
+
+.cover-img {
+  width: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
+  padding: 4px;
+}
 </style>
-@/renderer/store/main

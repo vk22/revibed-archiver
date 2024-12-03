@@ -1,11 +1,27 @@
 <template>
   <div class="track-card-small" v-if="track">
     <div class="track-player">
-      <div class="btn-audio pause" @click="pauseTrack(index)"
-        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title">
-        <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink">
-          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
+      <div
+        class="btn-audio pause"
+        @click="pauseTrack(index)"
+        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title"
+      >
+        <svg
+          width="22px"
+          height="30px"
+          viewBox="0 0 22 30"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          <g
+            id="Page-1"
+            stroke="none"
+            stroke-width="1"
+            fill="none"
+            fill-rule="evenodd"
+            opacity="0.900928442"
+          >
             <g id="pauseBtn" fill="#000000">
               <g id="Page-1">
                 <g id="Desktop-HD-Copy-3">
@@ -23,11 +39,32 @@
           </g>
         </svg>
       </div>
-      <div class="btn-audio play" @click="selectAndPlay(track, index, track.title, rip.projectID)" v-else>
-        <svg width="26px" height="32px" viewBox="0 0 26 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink">
-          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
-            <g id="Desktop-HD-Copy-3" transform="translate(-97.000000, -1135.000000)" fill="#000000">
+      <div
+        class="btn-audio play"
+        @click="selectAndPlay(track, index, track.title, rip.projectID)"
+        v-else
+      >
+        <svg
+          width="26px"
+          height="32px"
+          viewBox="0 0 26 32"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          <g
+            id="Page-1"
+            stroke="none"
+            stroke-width="1"
+            fill="none"
+            fill-rule="evenodd"
+            opacity="0.900928442"
+          >
+            <g
+              id="Desktop-HD-Copy-3"
+              transform="translate(-97.000000, -1135.000000)"
+              fill="#000000"
+            >
               <g id="player" transform="translate(0.000000, 1112.000000)">
                 <g id="Group-4" transform="translate(49.000000, 23.000000)">
                   <polygon id="Triangle" points="74 16 48 32 48 0"></polygon>
@@ -40,15 +77,25 @@
     </div>
 
     <div class="track-info">
-      <div class="mr-3"> {{ track.position }}. </div>
-      <div class="track-trackname" @click="pauseTrack(index)">
-        {{ track.title }}
-      </div>
-      <!-- <div class="track-info__r">
-        <div class="track-duration">
-          {{ props.rip }}
+      <div class="track-info__l">
+        <div class="mr-3"> {{ track.position }}. </div>
+        <div class="track-trackname" @click="pauseTrack(index)">
+          {{ track.title }}
         </div>
-      </div> -->
+      </div>
+
+      <div class="track-info__r">
+        <div class="add-to">
+          <button class="btn icon-btn" disabled>
+            <v-icon small>mdi-access-point</v-icon>
+          </button>
+        </div>
+        <div class="add-to">
+          <button class="btn icon-btn" disabled>
+            <v-icon small>mdi-heart</v-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -107,139 +154,6 @@ const pauseTrack = () => {
 }
 </script>
 
-<!-- <script>
-export default {
-  middleware: ['auth'],
-  props: ['track', 'index', 'rip'],
-  components: {},
-  data() {
-    return {
-      hasError: false,
-      checkFileResponse: true,
-      country: '',
-      genre: '',
-      style: '',
-      tag: '',
-      // canSave: false,
-      openTagsInputPanelState: false,
-      openTagsInputPanelCat: undefined,
-      checkedtrack: undefined
-      // playlist: []
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    //this.checkIfOrderEmpty()
-    clearInterval(this.t)
-    next()
-  },
-  methods: {
-    openPlaylistPanel() {
-      var data = {
-        isOpen: true,
-        tracks: [this.track]
-      }
-      this.$store.commit('playlist/setAddPlaylistPanelState', data)
-    },
-    async deleteTrack() {
-      const response = await this.$axios.$post('/delete-track-buffer', { track: this.track })
-      console.log('delete response ', response)
-      this.ifTrackDeleted = response.success
-      this.$emit('trackSaved', null)
-    },
-    removeDublikates(data) {
-      return data.filter(
-        (item, index, self) => index === self.findIndex((t) => t.text === item.text)
-      )
-    },
-    selectTrack(track) {
-      this.$store.commit('setSelectedTrack', {
-        projectID: rip.value.projectID,
-        projecFormat: rip.value.format,
-        title: track.position + '. ' + track.title,
-        artist: rip.value.artist,
-        path: track.position + '. ' + track.title,
-        howl: null,
-        display: true
-      })
-    },
-    playTrack() {
-      this.$emit('playtrack')
-    },
-    pauseTrack() {
-      this.$emit('pausetrack')
-    },
-    checkThisTrack(event, track) {
-      var data = {
-        isChecked: event.target.checked,
-        track: track
-      }
-      // $nuxt.$emit('checkForDelete', data)
-      this.$store.commit('tracksStore/setCheckedList', data)
-    },
-    openTagsInputPanel(cat) {
-      var data = {
-        isOpen: true,
-        category: cat,
-        track: this.track,
-        multi: false
-      }
-      this.$store.commit('setTagsInputPanelState', data)
-    },
-    openTrackStreamsPanel() {
-      if (this.track.plays.length) {
-        var data = {
-          isOpen: true,
-          streams: this.track.plays
-        }
-        this.$store.commit('tracksStore/setTrackStreamsPanel', data)
-      }
-    }
-    // checkIsCanSave(trackIds) {
-    //   //console.log('checkIsCanSave ', trackIds)
-    //   const canSave = trackIds.some(id => id === this.track.id)
-    //   if (canSave) {
-    //       this.track.canSave = true
-    //       //this.saveTrack()
-    //   }
-    //   //console.log('this.track.canSave ', this.track.canSave)
-    // }
-  },
-  mounted() { },
-  computed: {
-    // playingIndex() {
-    //   return this.$store.state.player.playingIndex
-    // },
-    // playing() {
-    //   return this.$store.state.player.playing
-    // },
-    // playingFile() {
-    //   return this.$store.state.player.playingFile
-    // },
-    // checkPause() {
-    //   return this.$store.state.player.onPause
-    // },
-    // playlist() {
-    //   return this.$store.state.playlist.playlist
-    // },
-    // videolist() {
-    //   return this.$store.getters['video/getVideoList']
-    // },
-    // streamlist() {
-    //   return this.$store.getters['video/getStreamList']
-    // }
-  },
-  created() {
-    // this.$nuxt.$on('trackCanSave', (data) => {
-    //   this.checkIsCanSave(data)
-    // })
-    // this.$nuxt.$on('returnvalue', (value) => {
-    //    console.log('returnRatingValue ', value)
-    // });
-  },
-  watch: {}
-}
-</script> -->
-
 <style lang="scss">
 @import '../assets/scss/main.scss';
 
@@ -264,7 +178,6 @@ export default {
   }
 
   &.play {
-
     // background-image: url('../assets/img/playBtn.svg');
     svg {
       width: 14px;
@@ -273,7 +186,6 @@ export default {
   }
 
   &.pause {
-
     // background-image: url('../assets/img/pauseBtn.svg');
     svg {
       width: 14px;
@@ -283,7 +195,6 @@ export default {
 }
 
 .trackItem {
-
   // transition: transform .25s 1s;
   // transform: translateY(10px);
   &.disabled {
@@ -331,15 +242,20 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     padding-right: 10px;
+
+    &__l {
+      display: flex;
+    }
 
     &__r {
       display: flex;
       align-items: center;
       flex-direction: row-reverse;
 
-      .track-duration {}
+      .track-duration {
+      }
 
       .add-to {
         // display: flex;
@@ -348,14 +264,15 @@ export default {
         // width: 10px;
         // height: 10px;
         // background: #f7f7f7;
-        margin-left: 1rem;
+        opacity: 1;
+        margin-left: 0.5rem;
 
         .icon-btn {
-          &:hover {
-            i {
-              color: #000000;
-            }
-          }
+          // &:hover {
+          //   i {
+          //     color: #000000;
+          //   }
+          // }
         }
 
         .btn.in-playlist {
@@ -373,7 +290,7 @@ export default {
   &.playing {
     background: #f7f7f7;
 
-    &>.track-trackname {
+    & > .track-trackname {
       opacity: 0.5;
     }
   }
@@ -381,7 +298,7 @@ export default {
   &:hover {
     cursor: pointer;
 
-    &>.track-trackname {
+    & > .track-trackname {
       opacity: 0.5;
     }
   }

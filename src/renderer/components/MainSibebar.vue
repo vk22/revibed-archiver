@@ -203,7 +203,7 @@ onMounted(() => {})
         // font-size: 0.75rem;
         img {
           margin-right: 15px;
-          width: 145px;
+          width: 160px;
         }
       }
     }
