@@ -178,6 +178,18 @@ class MainController {
       return false
     }
   }
+  async checkFiles() {
+    console.log('checkFiles start')
+    //const response = await FilesService.getSpectros()
+    const response2 = await FilesService.checkIfFilesAreMono()
+    console.log('checkFiles response', response)
+    if (response) {
+      return response
+    } else {
+      return false
+    }
+  }
+
 }
 
 export default new MainController()

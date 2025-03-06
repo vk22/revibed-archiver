@@ -7,7 +7,7 @@ function prepareReleaseData(discogsReleaseData) {
       discogsReleaseData.formats !== undefined ? discogsReleaseData.formats[0].name : ''
     const formatDescription =
       discogsReleaseData.formats !== undefined &&
-      discogsReleaseData.formats[0].descriptions != undefined
+        discogsReleaseData.formats[0].descriptions != undefined
         ? discogsReleaseData.formats[0].descriptions[0]
         : ''
 

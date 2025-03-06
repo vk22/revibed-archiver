@@ -10,6 +10,7 @@ const mm = require('music-metadata')
 // import getArtistName from './utils.js'
 const IMG_QUALITY = 50
 const RESIZE_WIDTH = 900 //px
+const restoredFileRate = '16/44100'
 
 //// ffmpeg
 import initFFmpeg from './ffmpegService.js'
@@ -303,7 +304,7 @@ class FilesService {
     return new Promise(function (resolve, reject) {
       if (imageSize > 600) {
         try {
-          ;(async () => {
+          ; (async () => {
             await sharp(mainImage.filepath)
               .resize(600, 600)
               .jpeg({
@@ -324,7 +325,7 @@ class FilesService {
         }
       } else {
         try {
-          ;(async () => {
+          ; (async () => {
             await sharp(mainImage.filepath)
               .jpeg({
                 quality: IMG_QUALITY
@@ -362,39 +363,65 @@ class FilesService {
         tracklist
       } = releaseData
 
-      ;(async () => {
-        const listOfPromises = files.map(async (file, index) => {
-          const indexTrack = index + 1
-          const filename = file.split('.').slice(0, -1).join('.')
-          const fileExt = extname(file)
-          let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
-          if (file[0] !== '.') {
-            const metadata = await mm.parseFile(folderDir + file)
-            const metadataTitle = metadata.common.title
-            //console.log('matchType', matchType)
-            let trackData = tracklist.find((tracklistItem) => {
-              /// поиск по matchType
-              console.log(
-                'поиск по matchType ',
-                filename,
-                tracklistItem.position,
-                filename === tracklistItem.position
-              )
-              if (tracklistItem.position) {
-                return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
-              }
-            })
-            console.log('prepareMetadata trackData ', trackData)
-            //// если есть совпадение
-            if (trackData) {
-              if (trackData.position != '') {
-                //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
-                trackArtist = getArtistName(trackData.artists, artist)
-                trackTitle = trackData.title.replace(/\//g, '-')
+        ; (async () => {
+          const listOfPromises = files.map(async (file, index) => {
+            const indexTrack = index + 1
+            const filename = file.split('.').slice(0, -1).join('.')
+            const fileExt = extname(file)
+            let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
+            if (file[0] !== '.') {
+              const metadata = await mm.parseFile(folderDir + file)
+              const metadataTitle = metadata.common.title
+              //console.log('matchType', matchType)
+              let trackData = tracklist.find((tracklistItem) => {
+                /// поиск по matchType
+                console.log(
+                  'поиск по matchType ',
+                  filename,
+                  tracklistItem.position,
+                  filename === tracklistItem.position
+                )
+                if (tracklistItem.position) {
+                  return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
+                }
+              })
+              console.log('prepareMetadata trackData ', trackData)
+              //// если есть совпадение
+              if (trackData) {
+                if (trackData.position != '') {
+                  //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
+                  trackArtist = getArtistName(trackData.artists, artist)
+                  trackTitle = trackData.title.replace(/\//g, '-')
+                  tagsData = {
+                    trackTitle: trackTitle,
+                    releaseAlbum: title,
+                    artists: trackArtist,
+                    albumArtists: albumArtists,
+                    styleAsString: styleAsString,
+                    year: year,
+                    indexTrack: indexTrack,
+                    trackCount: trackCount,
+                    media: media,
+                    sleeve: sleeve,
+                    formatName: format,
+                    formatDescription: formatDescription
+                  }
+                  oldPath = folderDir + file
+                  newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
+                  newPath = folderDir + newFilename
+                  if (oldPath !== newPath) {
+                    try {
+                      fs.renameSync(oldPath, newPath)
+                    } catch (err) {
+                      console.log(err)
+                    }
+                  }
+                }
+              } else {
                 tagsData = {
-                  trackTitle: trackTitle,
+                  trackTitle: '',
                   releaseAlbum: title,
-                  artists: trackArtist,
+                  artists: [artist],
                   albumArtists: albumArtists,
                   styleAsString: styleAsString,
                   year: year,
@@ -405,44 +432,18 @@ class FilesService {
                   formatName: format,
                   formatDescription: formatDescription
                 }
-                oldPath = folderDir + file
-                newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
-                newPath = folderDir + newFilename
-                if (oldPath !== newPath) {
-                  try {
-                    fs.renameSync(oldPath, newPath)
-                  } catch (err) {
-                    console.log(err)
-                  }
-                }
+                newPath = folderDir + file
+                errors.push({ message: 'Трек не найден (RESTORED)' })
               }
-            } else {
-              tagsData = {
-                trackTitle: '',
-                releaseAlbum: title,
-                artists: [artist],
-                albumArtists: albumArtists,
-                styleAsString: styleAsString,
-                year: year,
-                indexTrack: indexTrack,
-                trackCount: trackCount,
-                media: media,
-                sleeve: sleeve,
-                formatName: format,
-                formatDescription: formatDescription
-              }
-              newPath = folderDir + file
-              errors.push({ message: 'Трек не найден (RESTORED)' })
+              //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
+              return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
             }
-            //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
-            return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
-          }
-        })
-        console.log('listOfPromises ', listOfPromises)
-        const result = await Promise.all(listOfPromises)
-        console.log('prepareMetadata result ', JSON.stringify(result))
-        resolve(result)
-      })()
+          })
+          console.log('listOfPromises ', listOfPromises)
+          const result = await Promise.all(listOfPromises)
+          console.log('prepareMetadata result ', JSON.stringify(result))
+          resolve(result)
+        })()
 
       // result.forEach((item) => {
       //   if (item.errors.length) {
@@ -731,6 +732,152 @@ class FilesService {
 
     return result
   }
+  async getSpectros() {
+    const restoredData = {
+      folder: this.rootFolder,
+      audioFiles: this.filesRESTORED,
+      rate: restoredFileRate,
+      isRaw: false
+    }
+    // this.folderSPECTRO = this.rootFolder + "/SPECTRO/"
+    console.log('restoredData ', restoredData)
+    console.log('this.folderSPECTRO ', this.folderSPECTRO)
+    const result = await this.getFilesSpectros(restoredData, this.rootFolder)
+    this.restoredFilesList = result.restoredFilesList
+    return {
+      success: true,
+      message: 'Spectro done!'
+    }
+  }
+  async getFilesSpectros(restoredData, folderSPECTRO) {
+    let restoredFilesList = restoredData.audioFiles.map((el) => {
+      return { file: el }
+    })
+    const listOfPromises = restoredData.audioFiles.map((audioFile) => {
+      return this.createSpectro(restoredData.folder + '/' + audioFile, audioFile, folderSPECTRO)
+    })
+
+    let spectros = await Promise.all(listOfPromises)
+    spectros.forEach((name, index) => {
+      restoredFilesList[index].filename = name
+      restoredFilesList[index].spectro = folderSPECTRO + name + '-spectro.png'
+    })
+
+    console.log('getFilesSpectros FINAl')
+
+    return { restoredFilesList }
+  }
+  async createSpectro(filePath, filaname, rootFolder) {
+    console.log('createSpectro ', filePath, filaname, rootFolder)
+    let allSpectroList = []
+    return new Promise(function (resolve, reject) {
+      let extension = extname(filaname)
+      let name = basename(filaname, extension)
+      let spectrogram = child_process.spawn(ffmpegPath, [
+        '-i',
+        filePath,
+        `-lavfi`,
+        `showspectrumpic=s=2560x640:mode=separate`,
+        rootFolder + '/' + name + '-spectro.png'
+      ])
+      //let spectrogram = child_process.spawn('sox', [filePath, `-n spectrogram -o`, rootFolder + '/' + name + '-spectro.png']);
+      spectrogram
+        .on('data', (err) => {
+          console.log('err:', new String(err))
+        })
+        .on('exit', (statusCode) => {
+          if (statusCode === 0) {
+            //console.log("createSpectro done");
+            resolve(name)
+          }
+        })
+    }).then((result) => {
+      return result
+    })
+  }
+
+  ///
+  async getFileLog(filepath, index) {
+    const logfile = `logfile.log`;
+    const logfilePath = `${this.rootFolder}/logfile-${index}.log`;
+    const filepathHandled = `"${filepath}"`;
+    console.log('logfilePath ', logfilePath)
+    return new Promise(function (resolve, reject) {
+      let aphasemeter = child_process.spawn(ffmpegPath, [
+        `-i ${filepathHandled} -af "aphasemeter=video=0:phasing=1:angle=90:duration=1:tolerance=0.001,ametadata=print:file=${logfilePath}" -vn -f null -`
+      ])
+      // console.log('aphasemeter ', aphasemeter)
+
+      aphasemeter
+        .on('data', (err) => {
+          console.log('data:', new String(err))
+        })
+        .on('error', (err) => {
+          console.log('error:', new String(err))
+        })
+        .on('exit', (statusCode) => {
+          console.log('exit:', statusCode)
+          if (statusCode === 0) {
+            //console.log("createSpectro done");
+            resolve(logfilePath)
+          }
+        })
+    }).then((result) => {
+      return result
+    })
+  }
+  async parseFileLog(logFile) {
+    const goodArr = []
+    const badArr = []
+    let isMono = false
+    try {
+      const dataArray = fs.readFileSync(logFile, 'utf8').toString().split("\n");
+      //console.log(dataArray);
+      for (let i in dataArray) {
+        // console.log('dataArray[1] ', dataArray[i]);
+        if (dataArray[i].includes('phase=')) {
+          let phase = +dataArray[i].split('=')[1];
+          // console.log('phase ', phase)
+          if (phase === 1) {
+            badArr.push(phase);
+          } else {
+            goodArr.push(phase);
+          }
+
+        }
+
+      }
+      console.log('badArr.length ', badArr.length)
+      console.log('goodArr.length ', goodArr.length)
+
+      if (badArr.length > goodArr.length) {
+        isMono = true
+      }
+      return isMono;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async checkIfFilesAreMono() {
+    let index = 1
+    for (let filename of this.filesRESTORED) {
+      console.log('filename ', filename)
+      console.log('this.rootFolder ', this.rootFolder)
+      const filepath = `${this.rootFolder}/${filename}`
+      const logFile = await this.getFileLog(filepath, index);
+      const result = await this.parseFileLog(logFile);
+      console.log('result ', result)
+      index += 1
+    }
+
+    return {
+      success: true,
+      message: 'checkIfFilesAreMono done!'
+    }
+  }
+
 }
 
 export default new FilesService()

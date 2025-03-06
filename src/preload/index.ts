@@ -17,7 +17,8 @@ const mainAvailChannels: string[] = [
   'setUserLocalData',
   'msgRequestGetVersion',
   'msgOpenExternalLink',
-  'msgOpenFile'
+  'msgOpenFile',
+  'checkFiles'
 ]
 const rendererAvailChannels: string[] = []
 

@@ -50,6 +50,9 @@ export default class IPCs {
     ipcMain.handle('getReleaseForYoutube', async (event, data) => {
       return await MainController.getReleaseForYoutube(data)
     })
+    ipcMain.handle('checkFiles', async (event, data) => {
+      return await MainController.checkFiles(data)
+    })
 
     // Open url via web browser
     ipcMain.on('msgOpenExternalLink', async (event: IpcMainEvent, url: string) => {

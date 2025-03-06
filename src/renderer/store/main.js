@@ -419,6 +419,17 @@ export const useMainStore = defineStore('main', {
         this.setLoading({ state: false, finish: false })
       }
     },
+    async checkFiles() {
+      this.setLoading({ state: true })
+      // const { data } = await axios.post(`http://localhost:8000/api/check-files/`);
+      const response = await window.mainApi.invoke('checkFiles')
+      console.log('checkFiles STORE response ', response)
+      if (response.success) {
+        console.log('checkFiles response ', response)
+        this.setLoading({ state: false, finish: false })
+        // this.restoredFilesList = response.data.restoredFilesList
+      }
+    },
     setSelectedTrack(data) {
       this.selectedTrack = data
     },
