@@ -2,10 +2,10 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { isProxy, toRaw } from 'vue'
 
-//const API_URL_LABELS = 'http://localhost:3000';
-const API_URL_LABELS = 'https://tools.revibed.com/api'
+//const API_URL_TOOLS = 'http://localhost:3000';
+const API_URL_TOOLS = 'https://tools.revibed.com/api'
 const API_URL_REVIBED = 'https://system-api.revibed.com'
-const tokenRvbd = 'ozs6tZrfHNCSS4HnfRPvpvgVGbBj2JakfPyEXAtJcXukGNxCouBW2Gs6z7STZEfVyh4Tmg'
+const API_TOKEN_REVIBED = 'ozs6tZrfHNCSS4HnfRPvpvgVGbBj2JakfPyEXAtJcXukGNxCouBW2Gs6z7STZEfVyh4Tmg'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -96,24 +96,24 @@ export const useMainStore = defineStore('main', {
     },
     async getRevibedGoods() {
       const response = await axios.get(`${API_URL_REVIBED}/goods?size=5000`, {
-        headers: { Authorization: `Bearer ${tokenRvbd}` }
+        headers: { Authorization: `Bearer ${API_TOKEN_REVIBED}` }
       })
       return response
     },
     async getYoutubes() {
-      const response = await axios.get(`${API_URL_LABELS}/get-youtubes`)
+      const response = await axios.get(`${API_URL_TOOLS}/get-youtubes`)
       return response
     },
     async getLabels() {
-      const response = await axios.get(`${API_URL_LABELS}/get-labels`)
+      const response = await axios.get(`${API_URL_TOOLS}/get-labels`)
       return response
     },
     async getArtists() {
-      const response = await axios.get(`${API_URL_LABELS}/get-artists`)
+      const response = await axios.get(`${API_URL_TOOLS}/get-artists`)
       return response
     },
     async getServerDataReleases() {
-      const response = await axios.get(`${API_URL_LABELS}/get-releases`, {
+      const response = await axios.get(`${API_URL_TOOLS}/get-releases`, {
         headers: {
           'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
         }
@@ -121,7 +121,7 @@ export const useMainStore = defineStore('main', {
       return response
     },
     async getTracks() {
-      const response = await axios.get(`${API_URL_LABELS}/get-tracks`, {
+      const response = await axios.get(`${API_URL_TOOLS}/get-tracks`, {
         headers: {
           'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
         }
@@ -130,7 +130,7 @@ export const useMainStore = defineStore('main', {
     },
     async checkRelease(releaseID) {
       const response = await axios.post(
-        `${API_URL_LABELS}/check-release`,
+        `${API_URL_TOOLS}/check-release`,
         { releaseID: releaseID },
         {
           headers: {
@@ -228,7 +228,7 @@ export const useMainStore = defineStore('main', {
     },
     setReleases(data) {
       // console.log('setReleases', data)
-      this.allReleases = data.releases
+      this.allReleases = [].concat(data.releases).concat(data.notGoods)
       this.releases = data.releases
       this.sortedLabels = data.labels
       this.artists = data.artists
@@ -387,8 +387,12 @@ export const useMainStore = defineStore('main', {
           state: false,
           finish: true,
           message: {
-            title: 'Archive has been ready',
-            body: 'You have to move it to storage folder'
+            title: response.result.archiver.success
+              ? response.result.archiver.message
+              : 'Archiver Error',
+            body: response.result.revibed.success
+              ? response.result.revibed.message
+              : 'Revibed Error'
           }
         })
         this.$reset
@@ -667,7 +671,7 @@ export const useMainStore = defineStore('main', {
       return state.selectedTrack
     },
     getIfprojectExists: (state) => (id) => {
-      const findRelease = state.releases.find((item) => item.releaseID === +id)
+      const findRelease = state.allReleases.find((item) => item.releaseID === +id)
       console.log('getIfprojectExists ', findRelease)
       if (findRelease) {
         return { exist: true, type: findRelease.type }

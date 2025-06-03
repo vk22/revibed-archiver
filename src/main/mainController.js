@@ -10,7 +10,9 @@ class MainController {
     try {
       console.log('checkDropedFolder')
       const folder = data.folder
-      FilesService.setInitialData(folder)
+      const userLocalData = await UserService.getUserData()
+      const storageFolder = userLocalData.storageFolder
+      FilesService.setInitialData(folder, storageFolder)
       const folderFiles = await FilesService.parseFiles(folder, true)
       const errors = ErrorsService.getAll()
       ErrorsService.clear()
@@ -75,18 +77,39 @@ class MainController {
       const source = data.source
       const result = {
         archiver: undefined,
+        mover: undefined,
         revibed: undefined
       }
-      const responseArchiver = await FilesService.archiveProject()
+      let responseArchiver, responseMove, responseRevibed
+
+      //// archiver
+      responseArchiver = await FilesService.archiveProject()
       console.log('responseArchiver ', responseArchiver)
       result.archiver = responseArchiver
 
+      /// mover
       if (responseArchiver.success) {
-        ///// Save To Revibed
-        const responseRevibed = await ProjectService.sendToRevibed(source)
+        const { storageFolder, folderMAIN } = responseArchiver
+        responseMove = await FilesService.moveFolder(folderMAIN, storageFolder)
+        console.log('responseMove ', responseMove)
+        result.mover = responseMove
+      } else {
+        result.mover = {
+          success: false
+        }
+      }
+
+      ///// revibed
+      if (responseMove.success) {
+        responseRevibed = await ProjectService.sendToRevibed(source)
         console.log('responseRevibed ', responseRevibed)
         result.revibed = responseRevibed
+      } else {
+        result.revibed = {
+          success: false
+        }
       }
+
       return {
         success: true,
         result: result
@@ -189,7 +212,6 @@ class MainController {
       return false
     }
   }
-
 }
 
 export default new MainController()

@@ -1,10 +1,6 @@
-// const MyStore = require('./store.js')
-// const store = new MyStore({
-//   configReleases: 'anton-releases-db',
-//   configLabels: 'anton-label-db'
-// })
-const http = require('http')
 const axios = require('axios')
+//const API_URL_TOOLS = 'http://localhost:3000';
+const API_URL_TOOLS = 'https://tools.revibed.com/api'
 
 class ProjectService {
   constructor() {
@@ -28,17 +24,6 @@ class ProjectService {
         source: source,
         updated: Date.now()
       }
-      // project.updated = {}
-      // project.updated.$date = Date.now()
-      // const getCandidate = store.get(project.releaseID);
-      // console.log('getCandidate ', getCandidate)
-      // if (!getCandidate) {
-      //     const saveProject = store.set(project.releaseID, project);
-      //     console.log('saveProject ', saveProject)
-      //     if (!saveProject) {
-      //         console.log('save Rip error')
-      //     }
-
       // }
     } catch (err) {
       console.log('addProjectToStore err ', err)
@@ -47,7 +32,7 @@ class ProjectService {
   async sendToRevibed(source) {
     console.log('sendToRevibed source', source)
     const { owner, condition, quality } = source
-    const project = {
+    const release = {
       title: this.releaseData.title,
       artist: this.releaseData.artist,
       releaseID: this.releaseID,
@@ -65,9 +50,13 @@ class ProjectService {
       accept: 'application/json',
       'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
     }
-    console.log('sendToRevibed project', project)
+    console.log('sendToRevibed release', release)
     try {
-      const response = await axios.post(`https://tools.revibed.com/api/add-release`, project, {
+      const data = {
+        release: release,
+        user: 'admin'
+      }
+      const response = await axios.post(`${API_URL_TOOLS}/add-release`, data, {
         headers: headers
       })
       return response.data
@@ -78,42 +67,6 @@ class ProjectService {
         message: error.message
       }
     }
-
-    // return new Promise((resolve, reject) => {
-    //   try {
-    //     var postData = JSON.stringify(project)
-    //     const options = {
-    //       hostname: 'labels.kx-streams.com',
-    //       port: 80,
-    //       path: '/api/add-release',
-    //       method: 'POST',
-    //       headers: {
-    //         'content-type': 'application/json',
-    //         accept: 'application/json',
-    //         'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
-    //       }
-    //     }
-    //     const requestPost = http.request(options, (res) => {
-    //       res.setEncoding('utf8')
-    //       let body = ''
-    //       res.on('data', (chunk) => {
-    //         console.log(`BODY: ${chunk}`)
-    //         body += chunk;
-    //       })
-    //       res.on('end', () => {
-    //         console.log('No more data in response.', body)
-    //       })
-    //     })
-    //     requestPost.on('error', (e) => {
-    //       console.error(`problem with request: ${e.message}`)
-    //     })
-    //     requestPost.write(postData)
-    //     requestPost.end()
-    //     resolve(true)
-    //   } catch (err) {
-    //     console.log('saveReleaseToRevibed err ', err)
-    //   }
-    // })
   }
 }
 

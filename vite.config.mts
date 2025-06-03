@@ -12,6 +12,8 @@ import { builtinModules } from 'module'
 
 const isDevEnv = process.env.NODE_ENV === 'development'
 
+// console.log('process.env ', process.env)
+
 export default defineConfig(({ mode }) => {
   process.env = {
     ...(isDevEnv

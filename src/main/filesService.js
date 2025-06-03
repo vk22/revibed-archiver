@@ -9,7 +9,7 @@ const allowedVisualFormats = ['.jpg', '.jpeg', '.JPG', '.JPEG', '.png', '.PNG', 
 const mm = require('music-metadata')
 // import getArtistName from './utils.js'
 const IMG_QUALITY = 50
-const RESIZE_WIDTH = 900 //px
+const RESIZE_WIDTH = 2000 //px
 const restoredFileRate = '16/44100'
 
 //// ffmpeg
@@ -68,6 +68,17 @@ function artistNameHandler(str) {
   return result
 }
 
+const createDir = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+  }
+  return true
+}
+
+function moveFile(filePath, destinationPath) {
+  renameSync(filePath, destinationPath)
+}
+
 class FilesService {
   constructor() {
     this.rootFolder = null
@@ -77,9 +88,11 @@ class FilesService {
     this.restoredFilesList = []
     this.filesRESTORED = []
     this.mainImage = null
+    this.storageFolder = null
   }
-  setInitialData(rootFolder) {
+  setInitialData(rootFolder, storageFolder) {
     this.rootFolder = rootFolder
+    this.storageFolder = storageFolder
     const filesInFolder = fs.readdirSync(this.rootFolder)
     this.filesRESTORED = filesInFolder.filter((file) => {
       const fileExt = extname(file)
@@ -600,7 +613,7 @@ class FilesService {
     const oldPath = this.rootFolder + oldFilename
     const newPath = this.rootFolder + newFilename + '.jpg'
     try {
-      if (imageSize > 1599) {
+      if (imageSize > 2000) {
         await sharp(oldPath, { failOnError: false })
           .resize({
             fit: sharp.fit.contain,
@@ -700,37 +713,48 @@ class FilesService {
     /// get releaseID from ProjectService
     const releaseID = ProjectService.releaseID
     console.log('archiveProject releaseID ', releaseID)
-    if (!fs.existsSync(this.rootFolder)) {
-      fs.mkdirSync(this.rootFolder)
-    }
-    let { folderMAIN, allFilesList } = await this.createFolders(releaseID)
-    //this.allFilesList = allFilesList;
-    this.folderMAIN = folderMAIN
-    this.folderRESTORED = `${folderMAIN}/RESTORED/`
-    this.folderVISUAL = `${folderMAIN}/VISUAL/`
-    this.filesRESTORED = fs.readdirSync(this.folderRESTORED)
-    this.filesVISUAL = fs.readdirSync(this.folderVISUAL)
-
-    for (const file of this.filesRESTORED) {
-      const filePath = this.folderRESTORED + '/' + file
-      const fileExt = extname(file)
-      if (fileExt !== '.flac') {
-        await this.convertToFlac(filePath, file, this.folderRESTORED)
-      } else {
-        await this.changeFlac(filePath, file, this.folderRESTORED)
+    try {
+      if (!fs.existsSync(this.rootFolder)) {
+        fs.mkdirSync(this.rootFolder)
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
       }
     }
 
-    let result = {
-      success: true,
-      message: 'Project has been archived'
+    ////
+    try {
+      let { folderMAIN, allFilesList } = await this.createFolders(releaseID)
+      //this.allFilesList = allFilesList;
+      this.folderMAIN = folderMAIN
+      this.folderRESTORED = `${folderMAIN}/RESTORED/`
+      this.folderVISUAL = `${folderMAIN}/VISUAL/`
+      this.filesRESTORED = fs.readdirSync(this.folderRESTORED)
+      this.filesVISUAL = fs.readdirSync(this.folderVISUAL)
+
+      for (const file of this.filesRESTORED) {
+        const filePath = this.folderRESTORED + '/' + file
+        const fileExt = extname(file)
+        if (fileExt !== '.flac') {
+          await this.convertToFlac(filePath, file, this.folderRESTORED)
+        } else {
+          await this.changeFlac(filePath, file, this.folderRESTORED)
+        }
+      }
+      return {
+        success: true,
+        message: 'Release final files has been done!',
+        storageFolder: this.storageFolder,
+        folderMAIN: this.folderMAIN
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      }
     }
-
-    // if (this.folderSPECTRO) {
-    //   await fs.rmSync(this.folderSPECTRO, { recursive: true, force: true })
-    // }
-
-    return result
   }
   async getSpectros() {
     const restoredData = {
@@ -798,9 +822,9 @@ class FilesService {
 
   ///
   async getFileLog(filepath, index) {
-    const logfile = `logfile.log`;
-    const logfilePath = `${this.rootFolder}/logfile-${index}.log`;
-    const filepathHandled = `"${filepath}"`;
+    const logfile = `logfile.log`
+    const logfilePath = `${this.rootFolder}/logfile-${index}.log`
+    const filepathHandled = `"${filepath}"`
     console.log('logfilePath ', logfilePath)
     return new Promise(function (resolve, reject) {
       let aphasemeter = child_process.spawn(ffmpegPath, [
@@ -831,21 +855,19 @@ class FilesService {
     const badArr = []
     let isMono = false
     try {
-      const dataArray = fs.readFileSync(logFile, 'utf8').toString().split("\n");
+      const dataArray = fs.readFileSync(logFile, 'utf8').toString().split('\n')
       //console.log(dataArray);
       for (let i in dataArray) {
         // console.log('dataArray[1] ', dataArray[i]);
         if (dataArray[i].includes('phase=')) {
-          let phase = +dataArray[i].split('=')[1];
+          let phase = +dataArray[i].split('=')[1]
           // console.log('phase ', phase)
           if (phase === 1) {
-            badArr.push(phase);
+            badArr.push(phase)
           } else {
-            goodArr.push(phase);
+            goodArr.push(phase)
           }
-
         }
-
       }
       console.log('badArr.length ', badArr.length)
       console.log('goodArr.length ', goodArr.length)
@@ -853,10 +875,10 @@ class FilesService {
       if (badArr.length > goodArr.length) {
         isMono = true
       }
-      return isMono;
+      return isMono
     } catch (err) {
-      console.error(err);
-      return false;
+      console.error(err)
+      return false
     }
   }
 
@@ -866,8 +888,8 @@ class FilesService {
       console.log('filename ', filename)
       console.log('this.rootFolder ', this.rootFolder)
       const filepath = `${this.rootFolder}/${filename}`
-      const logFile = await this.getFileLog(filepath, index);
-      const result = await this.parseFileLog(logFile);
+      const logFile = await this.getFileLog(filepath, index)
+      const result = await this.parseFileLog(logFile)
       console.log('result ', result)
       index += 1
     }
@@ -878,6 +900,35 @@ class FilesService {
     }
   }
 
+  async moveFolder(dir, destination) {
+    console.log('dir ', dir)
+    console.log('destination ', destination)
+    const dirName = dir.replace(/\/$/, '').split('/').pop()
+    console.log('dirName ', dirName)
+    const mainDestPath = join(destination, dirName)
+    console.log('mainDestPath ', mainDestPath)
+    ///
+    createDir(mainDestPath)
+
+    for (const file of readdirSync(dir)) {
+      console.log('file ', file)
+      const filePath = join(dir, file)
+      const ifFile = fs.lstatSync(filePath).isFile()
+      const isDirectory = fs.lstatSync(filePath).isDirectory()
+      if (isDirectory) {
+        this.moveFolder(filePath, mainDestPath)
+      } else {
+        const filePathDest = join(mainDestPath, file)
+        console.log('filePathDest ', filePathDest)
+        moveFile(filePath, filePathDest)
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Release Folder has been moved'
+    }
+  }
 }
 
 export default new FilesService()

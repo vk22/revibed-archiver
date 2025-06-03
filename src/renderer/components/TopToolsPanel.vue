@@ -95,7 +95,7 @@ async function parseDiscogs() {
     (item) => item === 'warning' || item === 'blocked'
   )
   if (checkReleaseBeforeHandled) {
-    alert(JSON.stringify('Dangerous label!'))
+    alert(checkReleaseBefore.data.result)
   }
   /// Проверка на релиз
   const checkRelease = store.getIfprojectExists(releaseID)
@@ -103,8 +103,12 @@ async function parseDiscogs() {
   console.log('isRework ', isRework.value)
   if (checkRelease.exist) {
     // release exit
-    if (checkRelease.type === 'preorder' || checkRelease.type === 'allowed_to_buy') {
-      alert('This is ' + checkRelease.type)
+    if (
+      checkRelease.type === 'preorder' ||
+      checkRelease.type === 'allowed_to_buy' ||
+      checkRelease.type === 'onChecking'
+    ) {
+      alert('Release type: ' + checkRelease.type)
     } else {
       if (!isRework.value) {
         alert('This release already has been done!')
