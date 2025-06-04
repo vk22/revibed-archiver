@@ -239,7 +239,7 @@ class FilesService {
   }
   ffmpegImageConvert(path, path2) {
     return new Promise((resolve, reject) => {
-      const magick = child_process.spawn(ffmpegPath, ['-i', path, path2])
+      const magick = child_process.spawn(ffmpegPath, ['-i', path, '-q:v', '1', path2])
 
       magick.on('error', function (err) {
         console.log('magickConvert error: ' + err)
@@ -317,11 +317,11 @@ class FilesService {
     return new Promise(function (resolve, reject) {
       if (imageSize > 600) {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .resize(600, 600)
               .jpeg({
-                quality: IMG_QUALITY
+                quality: 50
               })
               .toFile(coverFilePath)
               .then((info) => {
@@ -338,7 +338,7 @@ class FilesService {
         }
       } else {
         try {
-          ; (async () => {
+          ;(async () => {
             await sharp(mainImage.filepath)
               .jpeg({
                 quality: IMG_QUALITY
@@ -376,65 +376,39 @@ class FilesService {
         tracklist
       } = releaseData
 
-        ; (async () => {
-          const listOfPromises = files.map(async (file, index) => {
-            const indexTrack = index + 1
-            const filename = file.split('.').slice(0, -1).join('.')
-            const fileExt = extname(file)
-            let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
-            if (file[0] !== '.') {
-              const metadata = await mm.parseFile(folderDir + file)
-              const metadataTitle = metadata.common.title
-              //console.log('matchType', matchType)
-              let trackData = tracklist.find((tracklistItem) => {
-                /// поиск по matchType
-                console.log(
-                  'поиск по matchType ',
-                  filename,
-                  tracklistItem.position,
-                  filename === tracklistItem.position
-                )
-                if (tracklistItem.position) {
-                  return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
-                }
-              })
-              console.log('prepareMetadata trackData ', trackData)
-              //// если есть совпадение
-              if (trackData) {
-                if (trackData.position != '') {
-                  //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
-                  trackArtist = getArtistName(trackData.artists, artist)
-                  trackTitle = trackData.title.replace(/\//g, '-')
-                  tagsData = {
-                    trackTitle: trackTitle,
-                    releaseAlbum: title,
-                    artists: trackArtist,
-                    albumArtists: albumArtists,
-                    styleAsString: styleAsString,
-                    year: year,
-                    indexTrack: indexTrack,
-                    trackCount: trackCount,
-                    media: media,
-                    sleeve: sleeve,
-                    formatName: format,
-                    formatDescription: formatDescription
-                  }
-                  oldPath = folderDir + file
-                  newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
-                  newPath = folderDir + newFilename
-                  if (oldPath !== newPath) {
-                    try {
-                      fs.renameSync(oldPath, newPath)
-                    } catch (err) {
-                      console.log(err)
-                    }
-                  }
-                }
-              } else {
+      ;(async () => {
+        const listOfPromises = files.map(async (file, index) => {
+          const indexTrack = index + 1
+          const filename = file.split('.').slice(0, -1).join('.')
+          const fileExt = extname(file)
+          let tagsData, newPath, oldPath, newFilename, trackTitle, trackArtist
+          if (file[0] !== '.') {
+            const metadata = await mm.parseFile(folderDir + file)
+            const metadataTitle = metadata.common.title
+            //console.log('matchType', matchType)
+            let trackData = tracklist.find((tracklistItem) => {
+              /// поиск по matchType
+              console.log(
+                'поиск по matchType ',
+                filename,
+                tracklistItem.position,
+                filename === tracklistItem.position
+              )
+              if (tracklistItem.position) {
+                return matchTypesFunctions[matchType](filename, metadataTitle, tracklistItem)
+              }
+            })
+            console.log('prepareMetadata trackData ', trackData)
+            //// если есть совпадение
+            if (trackData) {
+              if (trackData.position != '') {
+                //trackArtist = (trackData.artists) ? artistNameHandler(trackData.artists[0].anv) : artist
+                trackArtist = getArtistName(trackData.artists, artist)
+                trackTitle = trackData.title.replace(/\//g, '-')
                 tagsData = {
-                  trackTitle: '',
+                  trackTitle: trackTitle,
                   releaseAlbum: title,
-                  artists: [artist],
+                  artists: trackArtist,
                   albumArtists: albumArtists,
                   styleAsString: styleAsString,
                   year: year,
@@ -445,18 +419,44 @@ class FilesService {
                   formatName: format,
                   formatDescription: formatDescription
                 }
-                newPath = folderDir + file
-                errors.push({ message: 'Трек не найден (RESTORED)' })
+                oldPath = folderDir + file
+                newFilename = trackData.position.trim() + '. ' + trackTitle + fileExt
+                newPath = folderDir + newFilename
+                if (oldPath !== newPath) {
+                  try {
+                    fs.renameSync(oldPath, newPath)
+                  } catch (err) {
+                    console.log(err)
+                  }
+                }
               }
-              //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
-              return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+            } else {
+              tagsData = {
+                trackTitle: '',
+                releaseAlbum: title,
+                artists: [artist],
+                albumArtists: albumArtists,
+                styleAsString: styleAsString,
+                year: year,
+                indexTrack: indexTrack,
+                trackCount: trackCount,
+                media: media,
+                sleeve: sleeve,
+                formatName: format,
+                formatDescription: formatDescription
+              }
+              newPath = folderDir + file
+              errors.push({ message: 'Трек не найден (RESTORED)' })
             }
-          })
-          console.log('listOfPromises ', listOfPromises)
-          const result = await Promise.all(listOfPromises)
-          console.log('prepareMetadata result ', JSON.stringify(result))
-          resolve(result)
-        })()
+            //return this.addID3TagsOnly(newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC)
+            return { newPath, pathToPic, tagsData, newFilename, folderDir, needFLAC }
+          }
+        })
+        console.log('listOfPromises ', listOfPromises)
+        const result = await Promise.all(listOfPromises)
+        console.log('prepareMetadata result ', JSON.stringify(result))
+        resolve(result)
+      })()
 
       // result.forEach((item) => {
       //   if (item.errors.length) {
@@ -619,6 +619,9 @@ class FilesService {
             fit: sharp.fit.contain,
             width: RESIZE_WIDTH
           })
+          .jpeg({
+            quality: 100
+          })
           .toFile(newPath)
           .then((data) => {
             console.log('data ', data)
@@ -628,6 +631,9 @@ class FilesService {
           })
       } else {
         await sharp(oldPath, { failOnError: false })
+          .jpeg({
+            quality: 100
+          })
           .toFile(newPath)
           .then((data) => {
             console.log('data ', data)

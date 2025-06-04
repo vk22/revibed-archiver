@@ -208,9 +208,10 @@ const selectRow = (item) => {
 }
 
 function debounce(callee, timeoutMs) {
+  let lastCall
   return function perform(...args) {
-    let previousCall = this.lastCall
-    let lastCall = Date.now()
+    let previousCall = lastCall
+    lastCall = Date.now()
     if (previousCall && lastCall - previousCall <= timeoutMs) {
       clearTimeout(lastCallTimer)
     }
