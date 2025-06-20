@@ -71,6 +71,9 @@ class ExportService {
         }
       }
     }
+
+    await this.startAutouploadOnUploaderX(userFolders.youtubeUserID)
+
     return {
       success: true
     }
@@ -124,6 +127,25 @@ class ExportService {
       filename: filename
     })
     return fetch(`https://uploader-x.com/api/upload-file-rvbd`, { method: 'POST', body: form })
+  }
+
+  startAutouploadOnUploaderX(youtubeUserID) {
+    const body = {
+      data: {
+        //userID: '102814452894667054158',
+        userID: youtubeUserID,
+        uploadTemplate: '2',
+        privacyStatus: 'unlisted'
+      }
+    }
+    return fetch(`https://uploader-x.com/api/start-auto-upload`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
   }
 
   async convertToMp3(file) {

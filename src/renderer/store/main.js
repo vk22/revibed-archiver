@@ -11,6 +11,7 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     allReleases: [],
     releases: [],
+    releasesExtraFieldValues: [],
     tracks: [],
     youtubes: [],
     artists: [],
@@ -81,6 +82,11 @@ export const useMainStore = defineStore('main', {
     storageFolder: undefined
   }),
   actions: {
+    clearState() {
+      console.log('clearState')
+      this.$reset()
+      this.getServerData()
+    },
     setLoading(data) {
       if (data.finish) showNotification(data.message)
       this.loading = data.state
@@ -114,6 +120,14 @@ export const useMainStore = defineStore('main', {
     },
     async getServerDataReleases() {
       const response = await axios.get(`${API_URL_TOOLS}/get-releases`, {
+        headers: {
+          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+        }
+      })
+      return response
+    },
+    async getServerDataReleasesExtraFieldValues() {
+      const response = await axios.get(`${API_URL_TOOLS}/get-releases-all-extra-fields`, {
         headers: {
           'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
         }
@@ -155,6 +169,13 @@ export const useMainStore = defineStore('main', {
       if (getReleasesData.data.success) {
         this.setReleases(getReleasesData.data)
       }
+
+      const releasesExtraFieldValues = await this.getServerDataReleasesExtraFieldValues()
+      console.log('releasesExtraFieldValues response ', releasesExtraFieldValues.data)
+      if (releasesExtraFieldValues.data.success) {
+        this.setReleasesExtraFieldValues(releasesExtraFieldValues.data)
+      }
+
       this.userLocalFolders = await window.mainApi.invoke('getUserLocalData')
       this.storageFolder = toRaw(this.userLocalFolders).storageFolder
       console.log('storageFolder ', this.storageFolder)
@@ -235,6 +256,9 @@ export const useMainStore = defineStore('main', {
       this.onRevibedCount = data.onRevibedCount
       this.onYoutubeCount = data.onYoutubeCount
       this.countries = data.countries
+    },
+    setReleasesExtraFieldValues(data) {
+      this.releasesExtraFieldValues = data.data
     },
     async checkDropedFolder() {
       console.log('checkDropedFolder Store')
@@ -437,10 +461,6 @@ export const useMainStore = defineStore('main', {
     setSelectedTrack(data) {
       this.selectedTrack = data
     },
-    clearState() {
-      console.log('clearState')
-      this.$reset()
-    },
     ///// Filter
     setFilteredState(data) {
       console.log('setFilteredState ', data)
@@ -620,6 +640,9 @@ export const useMainStore = defineStore('main', {
         console.log('no filter')
         return state.releases
       }
+    },
+    getReleasesExtraFieldValues: (state) => (id) => {
+      return state.releasesExtraFieldValues[id]
     },
     getStorageFolder: (state) => {
       return state.storageFolder

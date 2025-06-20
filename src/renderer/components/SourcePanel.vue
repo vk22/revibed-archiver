@@ -57,7 +57,9 @@ const canSave = computed(() => {
 })
 
 /// data
-let ownersList = ['Anton', 'Revibed', 'KX Balance', 'KX']
+const ownersList = computed(() => {
+  return store.getReleasesExtraFieldValues('sources')
+})
 let ownersSelected = ref('')
 let conditionsList = ['M', 'NM', 'VG+', 'VG', 'G+', 'G', 'F', 'P']
 let conditionsSelected = ref('')

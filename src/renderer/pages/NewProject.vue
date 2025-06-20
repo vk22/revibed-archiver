@@ -141,6 +141,7 @@ import { ref } from 'vue'
 import CheckedFiles from '@/renderer/components/CheckedFiles.vue'
 import TopToolsPanel from '@/renderer/components/TopToolsPanel.vue'
 import SourcePanel from '@/renderer/components/SourcePanel.vue'
+// import { debounce } from 'vue-debounce'
 
 // import LoginPage from '@/renderer/components/LoginPage.vue'
 import { onMounted, computed } from 'vue'
@@ -208,33 +209,37 @@ const selectRow = (item) => {
 }
 
 function debounce(callee, timeoutMs) {
-  let lastCall
+  let lastCall, lastCallTimer
   return function perform(...args) {
     let previousCall = lastCall
     lastCall = Date.now()
     if (previousCall && lastCall - previousCall <= timeoutMs) {
       clearTimeout(lastCallTimer)
     }
-    let lastCallTimer = setTimeout(() => callee(...args), timeoutMs)
+    lastCallTimer = setTimeout(() => callee(...args), timeoutMs)
   }
 }
 
-onMounted(() => {
+const checkDropedFolderTest = () => {
+  console.log('checkDropedFolderTest')
+}
+
+const setDropEventListener = () => {
   window.addEventListener('drop', (event) => {
     event.preventDefault()
     event.stopPropagation()
-    console.log('event.dataTransfer.files ', event.dataTransfer.files)
+    console.log('drop')
     for (const f of event.dataTransfer.files) {
-      // Using the path attribute to get absolute file path
-      console.log('File Path of dragged files: ', f.path)
-      // this.folderPath = f.path + "/";
       store.setFolderPath(f.path + '/')
     }
-    const checkDropedFolderDebounced = debounce(store.checkDropedFolder(), 5000)
-    checkDropedFolderDebounced()
-
-    // this.folderPath = f.path
+    //const checkDropedFolderDebounced = debounce(store.checkDropedFolder, 5000)
+    //checkDropedFolderDebounced()
+    store.checkDropedFolder()
   })
+}
+
+onMounted(() => {
+  setDropEventListener()
 
   window.addEventListener('dragover', (e) => {
     e.preventDefault()
@@ -242,12 +247,12 @@ onMounted(() => {
   })
 
   window.addEventListener('dragenter', (event) => {
-    console.log('File is in the Drop Space', event)
+    // console.log('File is in the Drop Space', event)
     isHover.value = true
   })
 
   window.addEventListener('dragleave', (event) => {
-    console.log('File has left the Drop Space', event)
+    // console.log('File has left the Drop Space', event)
     isHover.value = false
   })
 })

@@ -134,8 +134,6 @@ function saveDiscogsTags() {
 function clearState() {
   discogsLinkTemp.value = undefined
   store.clearState()
-  store.$reset()
-  // document.location.reload()
 }
 function archiveProject() {
   store.archiveProject()

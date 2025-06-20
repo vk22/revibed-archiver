@@ -15,7 +15,8 @@ export const useUserStore = defineStore('user', {
     user: initialState,
     localFolders: {
       storageFolder: undefined,
-      exportFolder: undefined
+      exportFolder: undefined,
+      youtubeUserID: undefined
     }
   }),
   actions: {

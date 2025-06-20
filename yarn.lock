@@ -5725,6 +5725,11 @@ vite@^5.1.6:
   optionalDependencies:
     fsevents "~2.3.3"
 
+vue-debounce@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/vue-debounce/-/vue-debounce-5.0.1.tgz#c619e5af05eb6382663aa52ec16917cae1674361"
+  integrity sha512-tJWEDhjHQ47MAUnr7EtZvClNQZJUlKlzd6TVxkSCzWXjeCH/rcKbCDzrd6FNEhvxDOBsTfJFbb9P4f5Xc26Iag==
+
 vue-demi@>=0.14.5:
   version "0.14.6"
   resolved "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.6.tgz"

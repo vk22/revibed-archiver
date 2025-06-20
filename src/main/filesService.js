@@ -119,9 +119,9 @@ class FilesService {
           filepath: fullPath,
           errors: fileErrors
         }
-        console.log('fileStart ', fileStart)
+        //console.log('fileStart ', fileStart)
         const fileFinal = await this.readID3Tags(fileStart)
-        console.log('fileFinal ', fileFinal)
+        //console.log('fileFinal ', fileFinal)
         files.push(fileFinal)
 
         /// visual files

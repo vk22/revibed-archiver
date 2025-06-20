@@ -30,6 +30,16 @@
           :placeholder="'Path to local folder'"
         />
       </div>
+      <div class="field">
+        <label>Youtube User ID</label>
+        <input
+          class="input"
+          v-model="localFolders.youtubeUserID"
+          type="text"
+          :placeholder="'Path to local folder'"
+        />
+      </div>
+
       <!-- <div class="userrole">manager</div> -->
       <div class="mt-2 mb-3">
         <button class="btn main" @click="save()">Save</button>
