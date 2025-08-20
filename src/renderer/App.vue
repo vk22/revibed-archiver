@@ -3,7 +3,7 @@
     <v-app>
       <!-- notification -->
       <div v-if="loading" class="loading-screen wait-message">
-        <v-progress-circular color="red" indeterminate rounded height="6"></v-progress-circular>
+        <v-progress-circular color="purple" indeterminate rounded height="6"></v-progress-circular>
       </div>
 
       <!-- sidebar -->
@@ -15,7 +15,7 @@
           <div class="main-menu">
             <div class="left">
               <router-link class="link" :to="{ name: 'NewProject' }">Add new</router-link>
-              <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link>
+              <router-link class="link" :to="{ name: 'RipsList' }">Releases</router-link>
             </div>
             <div class="right">
               <!-- <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link> -->
@@ -34,6 +34,7 @@
           <div class="main-container" v-if="true">
             <router-view />
           </div>
+          <PlayerPlaylistPanel></PlayerPlaylistPanel>
           <Player></Player>
         </v-container>
       </v-main>
@@ -43,7 +44,8 @@
 
 <script setup>
 import MainSibebar from '@/renderer/components/MainSibebar.vue'
-import Player from '@/renderer/components/Player/MainPlayer2.vue'
+import Player from '@/renderer/components/Player/MainPlayer.vue'
+import PlayerPlaylistPanel from '@/renderer/components/Player/PlayerPlaylistPanel.vue'
 // import LoginPage from '@/renderer/components/LoginPage.vue'
 import { onMounted, computed } from 'vue'
 import { useMainStore } from '@/renderer/store/main'
@@ -152,12 +154,13 @@ onMounted(() => {
     &:hover {
       color: #ffffff;
       background: #222222;
+      text-decoration: none;
       // border-bottom: 3px solid #e1e1e1;
     }
 
     &.router-link-active {
       //background: $color_green;
-      background: #111111;
+      background: #2d2d2d;
       // border-bottom: 3px solid $color_blue;
       color: #ffffff;
     }

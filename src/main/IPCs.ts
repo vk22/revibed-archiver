@@ -1,6 +1,7 @@
 import { ipcMain, shell, IpcMainEvent, dialog } from 'electron'
 import Constants from './utils/Constants'
 import MainController from './mainController.js'
+import fs from 'node:fs/promises'
 
 /*
  * IPC Communications
@@ -52,6 +53,9 @@ export default class IPCs {
     })
     ipcMain.handle('checkFiles', async (event, data) => {
       return await MainController.checkFiles(data)
+    })
+    ipcMain.handle('readFile', (event, filePath) => {
+      return fs.readFile(filePath, 'utf-8')
     })
 
     // Open url via web browser

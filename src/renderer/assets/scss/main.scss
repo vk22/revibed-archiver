@@ -116,6 +116,14 @@ a {
   }
 }
 
+.link {
+  cursor: pointer;
+  &:hover {
+    color: #222;
+    text-decoration: underline;
+  }
+}
+
 .disabled {
   opacity: 0.25;
   pointer-events: none;
@@ -149,7 +157,7 @@ a {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: $color_grey;
+  background-color: #fff;
   // background-image: linear-gradient(-180deg, rgba(255,255,255,0.09) 0%, rgba(17,17,17,0.04) 100%);
   padding: 0rem 0.75rem;
   border: 1px solid $color_grey;

@@ -6,3 +6,5 @@ const getTargetFolder = (mainFolder, innerFolders, folderName) => {
     }
   })
 }
+
+/// for i in *.png ; do convert "$i" "${i%.*}.jpg" ; done

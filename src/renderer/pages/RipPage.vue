@@ -41,36 +41,6 @@
             </div>
             <br />
           </div>
-          <!-- <div class="tools-btns">
-
-            <button class="btn sm-btn" @click="sendToRevibed">Send To Revibed</button>
-            <button class="btn sm-btn" @click="archiveRip">Archive</button>
-            <button class="btn sm-btn" @click="getTracklist">Get Discogs</button>
-
-
-            <div class="delete-btn">
-              <v-dialog v-model="dialog" width="500">
-                <template v-slot:activator="{ on, attrs }">
-                  <button class="btn sm-btn outline" v-bind="attrs" v-on="on">Delete</button>
-                </template>
-
-<v-card>
-  <v-card-title class="text-h5 grey lighten-2">
-    <h4>Delete forever?</h4>
-  </v-card-title>
-
-
-  <v-divider></v-divider>
-
-  <v-card-actions>
-    <v-spacer></v-spacer>
-    <button class="btn sm-btn outline" @click="deleteRip">Delete forever</button>
-  </v-card-actions>
-</v-card>
-</v-dialog>
-</div>
-
-</div> -->
         </div>
       </div>
       <div class="rip-inner__bottom">
@@ -82,7 +52,7 @@
             :key="index"
             :class="{ playing: playingFile == track.position + '. ' + track.title }"
             :index="index"
-            @playtrack="play(index, track.title, track.projectID)"
+            @playtrack="play(index, track.title, track.releaseID)"
             @pausetrack="pause(index)"
           >
           </TracksOneTrack>
@@ -137,7 +107,7 @@ const rip = computed(() => {
   const rip = storeMain.getReleaseOne(route.params.id)
   if (rip) {
     rip.allstyles = rip.genres.concat(rip.styles)
-    ripCover.value = 'file://' + storageFolder.value + '/' + rip.releaseID + '/VISUAL/Front.jpg'
+    ripCover.value = 'file://' + storageFolder.value + '/' + rip.releaseID + '/cover.jpg'
   }
 
   return rip
@@ -155,7 +125,7 @@ function imageLoadError() {
   //
 }
 
-const play = (index, filename) => {
+const play = (index, filename, releaseID) => {
   const playlist = {
     source: 'tracks',
     tracks: []
@@ -163,7 +133,7 @@ const play = (index, filename) => {
   const play = {
     index: index,
     filename: filename,
-    releaseID: rip.value.releaseID
+    releaseID: releaseID
   }
   tracks.value.forEach((track) => {
     playlist.tracks.push({

@@ -79,7 +79,9 @@ export const useMainStore = defineStore('main', {
     },
     onYoutubeCount: 0,
     onRevibedCount: 0,
-    storageFolder: undefined
+    storageFolder: undefined,
+    allStyles: [],
+    selectedStyleInFilter: undefined
   }),
   actions: {
     clearState() {
@@ -157,32 +159,29 @@ export const useMainStore = defineStore('main', {
     async getServerData() {
       console.time('getAllData')
       this.allDataReady = false
-
       const getRevibedGoodsData = await this.getRevibedGoods()
-      console.log('getRevibedGoodsData response ', getRevibedGoodsData.data.data.length)
+      // console.log('getRevibedGoodsData response ', getRevibedGoodsData.data.data.length)
       if (getRevibedGoodsData.data.success) {
         this.setRevibedGoods(getRevibedGoodsData.data.data)
       }
-
       const getReleasesData = await this.getServerDataReleases()
-      console.log('getReleases response ', getReleasesData.data)
+      // console.log('getReleases response ', getReleasesData.data)
       if (getReleasesData.data.success) {
         this.setReleases(getReleasesData.data)
       }
-
       const releasesExtraFieldValues = await this.getServerDataReleasesExtraFieldValues()
-      console.log('releasesExtraFieldValues response ', releasesExtraFieldValues.data)
+      // console.log('releasesExtraFieldValues response ', releasesExtraFieldValues.data)
       if (releasesExtraFieldValues.data.success) {
         this.setReleasesExtraFieldValues(releasesExtraFieldValues.data)
       }
 
       this.userLocalFolders = await window.mainApi.invoke('getUserLocalData')
       this.storageFolder = toRaw(this.userLocalFolders).storageFolder
-      console.log('storageFolder ', this.storageFolder)
+      // console.log('storageFolder ', this.storageFolder)
       this.allDataReady = true
       console.timeEnd('getAllData')
       const getTracksData = await this.getTracks()
-      console.log('getTracksData ', getTracksData)
+      // console.log('getTracksData ', getTracksData)
       if (getTracksData.data.success) {
         this.tracks = getTracksData.data.tracks
       }
@@ -256,6 +255,21 @@ export const useMainStore = defineStore('main', {
       this.onRevibedCount = data.onRevibedCount
       this.onYoutubeCount = data.onYoutubeCount
       this.countries = data.countries
+      setTimeout(() => {
+        this.setStyles()
+      }, 1000)
+    },
+    setStyles(data) {
+      let allStyles = this.allReleases.reduce((acc, curr) => {
+        curr.styles.forEach((el) => acc.push(el))
+        return acc
+      }, [])
+
+      allStyles = removeDublikatesAndCount(allStyles)
+      allStyles.sort(function (a, b) {
+        return b.count - a.count
+      })
+      this.allStyles = allStyles
     },
     setReleasesExtraFieldValues(data) {
       this.releasesExtraFieldValues = data.data
@@ -559,6 +573,9 @@ export const useMainStore = defineStore('main', {
           body: 'You can start upload'
         }
       })
+    },
+    setSelectedStyleInFilter(tag) {
+      this.selectedStyleInFilter = tag
     }
   },
   getters: {
@@ -636,6 +653,8 @@ export const useMainStore = defineStore('main', {
             return preResult
           }
         }
+      } else if (state.selectedStyleInFilter) {
+        return state.releases.filter((item) => item.styles.includes(state.selectedStyleInFilter))
       } else {
         console.log('no filter')
         return state.releases
@@ -715,6 +734,9 @@ export const useMainStore = defineStore('main', {
     getReleasesFilter(state) {
       console.log('getReleasesFilter ', state.releasesFilter)
       return state.releasesFilter
+    },
+    getAllStyles(state) {
+      return state.allStyles
     }
   }
 })

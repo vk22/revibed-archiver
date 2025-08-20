@@ -86,7 +86,10 @@
 
       <div class="track-info__r">
         <div class="add-to">
-          <button class="btn icon-btn" disabled>
+          <button
+            class="btn icon-btn"
+            @click="startRadio(track, index, track.title, rip.projectID)"
+          >
             <v-icon small>mdi-access-point</v-icon>
           </button>
         </div>
@@ -106,7 +109,7 @@ import { usePlayerStore } from '@/renderer/store/player'
 const store = usePlayerStore()
 
 const props = defineProps(['track', 'index', 'rip'])
-const emit = defineEmits(['playtrack', 'pausetrack'])
+const emit = defineEmits(['playtrack', 'pausetrack', 'startRadio'])
 
 //// computed
 
@@ -136,6 +139,18 @@ const selectAndPlay = (track, index, title, releaseID) => {
 const selectTrack = (track) => {
   console.log('rip ', props.rip)
   store.setSelectedTrack({
+    releaseID: props.rip.releaseID,
+    title: track.position + '. ' + track.title,
+    artist: props.rip.artist,
+    path: track.position + '. ' + track.title,
+    howl: null,
+    display: true
+  })
+}
+
+const startRadio = (track) => {
+  store.startRadio({
+    position: track.position,
     releaseID: props.rip.releaseID,
     title: track.position + '. ' + track.title,
     artist: props.rip.artist,

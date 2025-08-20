@@ -24,6 +24,11 @@ app.config.globalProperties.$filters = {
     let sec_str = sec < 10 ? '0' + sec : sec
     let value_str = min_str + ':' + sec_str
     return value_str
+  },
+  toMinAndHours(seconds) {
+    var date = new Date(0)
+    date.setSeconds(seconds)
+    return date.toISOString().substr(11, 8)
   }
 }
 

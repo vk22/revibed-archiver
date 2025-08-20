@@ -169,6 +169,9 @@
           </g>
         </svg>
       </div>
+      <div class="playerBtn" @click="store.setPlaylistPanelIsOpen()">
+        <v-icon small>mdi-format-list-bulleted</v-icon>
+      </div>
     </div>
     <div class="progressInner">
       <!-- <div class="playerBtn" id="volumeBtn"></div> -->
@@ -184,7 +187,8 @@
       <v-slider
         dense
         :color="'#222'"
-        :track-color="'#222'"
+        :track-color="'#b2b2b2'"
+        :thumb-size="12"
         v-model="volume"
         @update:modelValue="updateVolume(volume)"
         max="1"
@@ -212,7 +216,7 @@ const props = defineProps([
   'waitingMusic',
   'playerIsActive'
 ])
-const emit = defineEmits(['playtrack', 'pausetrack', 'skiptrack', 'updateseek'])
+const emit = defineEmits(['playtrack', 'pausetrack', 'skiptrack', 'updateseek', 'updatevolume'])
 const muted = ref(false)
 const volume = ref(0.5)
 
@@ -230,8 +234,8 @@ const skipTrack = (direction) => {
   emit('skiptrack', direction)
 }
 const updateVolume = (volume) => {
-  // console.log('volume ', volume)
-  Howler.volume(volume)
+  console.log('volume ', volume)
+  emit('updatevolume', volume)
 }
 const toggleMute = (volume) => {
   Howler.mute(!muted.value)
@@ -294,7 +298,7 @@ const getClickPosition = (event) => {
 
   .controlsInner {
     position: relative;
-    width: 175px;
+    width: 220px;
     // height: 100%;
     // left: 0;
     // margin: 0 40px;
@@ -310,7 +314,7 @@ const getClickPosition = (event) => {
     .controlsCenter {
       display: flex;
       justify-content: flex-start;
-      width: 25px;
+      width: 20px;
     }
 
     .playerBtn {
@@ -330,8 +334,7 @@ const getClickPosition = (event) => {
 
     #playBtn {
       // background-image: url('../../assets/img/playBtn.svg');
-      width: 25px;
-      height: 30px;
+      width: 20px;
       // left: 43%;
       // top: 33%;
       background-size: 100%;
@@ -340,8 +343,7 @@ const getClickPosition = (event) => {
 
     #pauseBtn {
       // background-image: url('../../assets/img/pauseBtn.svg');
-      width: 20px;
-      height: 30px;
+      width: 15px;
       // left: 43%;
       // top: 33%;
       background-size: 100%;
@@ -350,7 +352,7 @@ const getClickPosition = (event) => {
 
     #prevBtn {
       // background-image: url('../../assets/img/prevBtn.svg');
-      width: 25px;
+      width: 20px;
       height: 20px;
       // left: 0;
       // top: 33%;
@@ -360,7 +362,7 @@ const getClickPosition = (event) => {
 
     #nextBtn {
       // background-image: url('../../assets/img/nextBtn.svg');
-      width: 25px;
+      width: 20px;
       height: 20px;
       // right: 0;
       // top: 33%;
@@ -394,9 +396,10 @@ const getClickPosition = (event) => {
         top: 4px;
         cursor: pointer;
         width: 100%;
-        height: 8px;
-        background-color: rgba(0, 0, 0, 0.1);
+        height: 4px;
+        background-color: #0000001a;
         opacity: 0.9;
+        border-radius: 99px;
 
         @include for-phone-only {
           display: none;
@@ -405,12 +408,13 @@ const getClickPosition = (event) => {
 
       #progress {
         position: relative;
-        top: -4px;
+        top: 0px;
         left: 0px;
         width: 0%;
-        height: 8px;
+        height: 4px;
         background-color: #000;
         z-index: -1;
+        border-radius: 99px;
 
         @include for-phone-only {
           display: none;
@@ -444,6 +448,10 @@ const getClickPosition = (event) => {
 
     .v-input__slider {
       height: 32px;
+    }
+
+    .v-slider-track {
+      height: 4px !important;
     }
 
     @include for-phone-only {

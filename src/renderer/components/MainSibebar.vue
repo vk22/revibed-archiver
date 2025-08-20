@@ -1,5 +1,6 @@
 <template>
   <!-- sidebar -->
+
   <v-navigation-drawer v-model="sideNav" permanent app class="sidebar">
     <div class="pa-3 main-logo">
       <div class="main-logo__wrap">
@@ -8,69 +9,72 @@
         </div>
       </div>
     </div>
-
-    <div v-if="folderDropped">
-      <div v-if="folderFiles.visual.length" class="folder-files pa-3 section">
-        <div class="heading">Visual</div>
-        <div class="images-container">
-          <div v-for="(visual, i) in folderFiles.visual" :key="i" class="image-item">
-            <img
-              :src="'file://' + visual.filepath"
-              :class="{ main: visual.filename === selectedVisual.filename }"
-              @click="selectImage(visual)"
-            />
-            <div class="checkbox-on-image">
-              <input
-                id="mainImage"
-                type="checkbox"
-                :checked="mainImage.filename === visual.filename"
-                @change="setMainImage(visual, $event)"
+    <div v-if="routeName === 'NewProject'">
+      <div v-if="folderDropped">
+        <div v-if="folderFiles.visual.length" class="folder-files pa-3 section">
+          <div class="heading">Visual</div>
+          <div class="images-container">
+            <div v-for="(visual, i) in folderFiles.visual" :key="i" class="image-item">
+              <img
+                :src="'file://' + visual.filepath"
+                :class="{ main: visual.filename === selectedVisual.filename }"
+                @click="selectImage(visual)"
               />
-              <!-- <label for="mainImage">Main</label> -->
+              <div class="checkbox-on-image">
+                <input
+                  id="mainImage"
+                  type="checkbox"
+                  :checked="mainImage.filename === visual.filename"
+                  @change="setMainImage(visual, $event)"
+                />
+                <!-- <label for="mainImage">Main</label> -->
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div v-else class="folder-files pa-3">
-        <div class="folder-files__title">Visual</div>
-        <div class="no-items">No Images</div>
-      </div>
-      <div v-if="selectedVisual.filename" class="selected-image">
-        <div class="input-wrap">
-          <label>Filename</label>
-          <div>{{ selectedVisual.filename }}</div>
+        <div v-else class="folder-files pa-3">
+          <div class="folder-files__title">Visual</div>
+          <div class="no-items">No Images</div>
         </div>
-        <div class="input-wrap mt-2">
-          <label>Size</label>
-          <div>{{ selectedVisual.imageSize }}</div>
-        </div>
-        <div class="select-wrap">
-          <label>New Filename</label>
-          <v-select
-            v-model="newFilenameSelected"
-            :items="coversNamesList"
-            variant="outlined"
-            density="compact"
-            @change="changeFilenameDone()"
-            placeholder="Choose filename"
-          ></v-select>
-        </div>
+        <div v-if="selectedVisual.filename" class="selected-image">
+          <div class="input-wrap">
+            <label>Filename</label>
+            <div>{{ selectedVisual.filename }}</div>
+          </div>
+          <div class="input-wrap mt-2">
+            <label>Size</label>
+            <div>{{ selectedVisual.imageSize }}</div>
+          </div>
+          <div class="select-wrap">
+            <label>New Filename</label>
+            <v-select
+              v-model="newFilenameSelected"
+              :items="coversNamesList"
+              variant="outlined"
+              density="compact"
+              @change="changeFilenameDone()"
+              placeholder="Choose filename"
+            ></v-select>
+          </div>
 
-        <div class="mt-5 d-flex">
-          <button
-            class="btn main mr-1"
-            @click="editImage()"
-            :class="{ disable: !newFilenameSelected }"
-            >Save</button
-          >
-          <button class="btn error" @click="deleteFile()">Delete</button>
+          <div class="mt-5 d-flex">
+            <button
+              class="btn main mr-1"
+              @click="editImage()"
+              :class="{ disable: !newFilenameSelected }"
+              >Save</button
+            >
+            <button class="btn error" @click="deleteFile()">Delete</button>
+          </div>
         </div>
+      </div>
+      <div v-if="folderDropped">
+        <GlobalErrors />
+        <SelectedTrackComp />
       </div>
     </div>
-
-    <div v-if="folderDropped">
-      <GlobalErrors />
-      <SelectedTrackComp />
+    <div v-if="routeName === 'RipsList' || routeName === 'RipPage'">
+      <FilterByStyles></FilterByStyles>
     </div>
 
     <div class="sibebar-footer">
@@ -80,7 +84,9 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
+import FilterByStyles from '@/renderer/components/FilterByStyles.vue'
 import SelectedTrackComp from '@/renderer/components/SelectedTrackComp.vue'
 import GlobalErrors from '@/renderer/components/GlobalErrors.vue'
 
@@ -89,23 +95,14 @@ import { onMounted, computed } from 'vue'
 import { useMainStore } from '@/renderer/store/main'
 const store = useMainStore()
 
-const folderPath = computed(() => {
-  return store.getFolderPath
-})
-const folderFilesReady = computed(() => {
-  return store.getFolderFilesReadyState
-})
+const route = useRoute()
+const routeName = computed(() => route.name)
+
 const folderDropped = computed(() => {
   return store.getFolderDroppedState
 })
 const folderFiles = computed(() => {
   return store.getFolderDroppedData
-})
-const allDataInStore = computed(() => {
-  return store.allDataInStore
-})
-const selectedTrack = computed(() => {
-  return store.selectedTrack
 })
 const selectedVisual = computed(() => {
   return store.selectedVisual
@@ -113,6 +110,9 @@ const selectedVisual = computed(() => {
 const mainImage = computed(() => {
   return store.mainImage
 })
+// const allStyles = computed(() => {
+//   return store.getAllStyles
+// })
 
 /// data
 let sideNav = ref(true)

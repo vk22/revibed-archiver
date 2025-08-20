@@ -62,15 +62,12 @@
           show-select
           item-value="_id"
           items-per-page="100"
+          v-model:sort-by="sortBy"
         >
           <template v-slot:item.cover="{ item }">
             <router-link :to="{ name: 'RipPage', params: { id: item.releaseID } }">
               <img
-                :src="'file://' + storageFolder + '/' + item.releaseID + '/VISUAL/Front.jpg'"
-                @error="
-                  $event.target.src =
-                    'file://' + storageFolder + '/' + item.releaseID + '/VISUAL/A.jpg'
-                "
+                :src="'file://' + storageFolder + '/' + item.releaseID + '/cover.jpg'"
                 class="cover-img"
               />
             </router-link>
@@ -189,6 +186,8 @@ const headers = ref([
   // { text: "Errors", value: "errors", sortable: false },
 ])
 
+const sortBy = ref([{ key: 'updated', order: 'desc' }])
+
 onMounted(() => {})
 </script>
 
@@ -196,35 +195,10 @@ onMounted(() => {})
 @import '../assets/scss/main.scss';
 
 .loading-screen-container {
-  position: relative;
-}
-
-.loading-screen {
-  position: absolute;
-  z-index: 99999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  margin: 0 !important;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  color: #fff;
-  border-radius: 0;
-  padding-top: 25%;
-
-  .v-progress-circular {
-    color: mediumvioletred;
-  }
-
-  &.success-message {
-    background: #ccffe58c;
-  }
-
-  p {
-    margin-bottom: 0px !important;
-  }
+  align-items: center;
+  height: 95vh;
 }
 
 .releases-list {
