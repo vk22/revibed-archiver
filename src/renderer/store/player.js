@@ -15,7 +15,7 @@ export const usePlayerStore = defineStore('player', {
     selectedTrack: undefined,
     onPause: false,
     source: undefined,
-    skipToState: false,
+    skipToState: false
     // playerIsActive: false
   }),
 
@@ -66,7 +66,7 @@ export const usePlayerStore = defineStore('player', {
     skipTo(index) {
       console.log('jumpTo ', index)
       this.playingIndex = index
-      this.initSkip(true);
+      this.initSkip(true)
     },
     initPlay(play) {
       // console.log('initPlay ', this.initPlay, play)
@@ -146,8 +146,8 @@ export const usePlayerStore = defineStore('player', {
       while (n < count) {
         n++
         const results = await musicRecommendations.findSimilar(currentTrack, 1)
-        if (!results.length) continue
-        currentTrack = results[0].track
+        if (!results) continue
+        currentTrack = results.track
         //console.log('currentTrack ', currentTrack)
         playlist.tracks.push({
           releaseID: currentTrack.releaseID,

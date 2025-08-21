@@ -20,6 +20,10 @@ function norm(vec) {
   return vec.map((v) => (v - mean) / std)
 }
 
+function randomIntFromInterval(min, max) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export default class MRecommendations {
   constructor() {
     this.tracksDB = null
@@ -66,7 +70,12 @@ export default class MRecommendations {
     }
 
     scored.sort((a, b) => b.score - a.score)
-    return scored.slice(0, k)
+    ///
+    const sortNum = 3;
+    const sortedArr = scored.slice(0, sortNum);
+    const randomIndex = randomIntFromInterval(0, sortNum - 1);
+
+    return sortedArr[randomIndex]
   }
 
   async getTarget(track) {

@@ -18,8 +18,8 @@
           <div class="num">
             {{ index + 1 }}
           </div>
-          <div class="cover" @click="skipTo(index)">
-            <div class="track-player">
+          <div class="cover">
+            <div class="track-player" :class="{ 'visible': !checkPause && playingFile.filename == item.path }">
               <div class="btn-audio pause" @click="pauseTrack(index)"
                 v-if="!checkPause && playingFile.filename == item.path">
                 <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +42,7 @@
                   </g>
                 </svg>
               </div>
-              <div class="btn-audio play" @click="selectAndPlay(track, index, track.title, rip.projectID)" v-else>
+              <div class="btn-audio play" @click="play(item, index)" v-else>
                 <svg width="26px" height="32px" viewBox="0 0 26 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink">
                   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
@@ -121,9 +121,33 @@ const checkPause = computed(() => {
   return store.onPause
 })
 
-function skipTo(index) {
-  //setTimeout(() => {
-  store.skipTo(index)
+/// play contols
+
+
+const play = (track, index) => {
+
+  if (!checkPause.value) {
+    store.skipTo(index)
+  } else {
+
+    store.setSelectedTrack({
+      releaseID: track.releaseID,
+      title: track.path,
+      artist: track.artist,
+      path: track.path,
+    })
+
+    store.play({
+      index: index,
+      filename: track.title,
+      releaseID: track.releaseID
+    })
+  }
+
+}
+
+const pauseTrack = (index) => {
+  store.pause(index)
 }
 
 // const playlist = computed({
@@ -308,7 +332,7 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #00000055;
+        background: #0000002b;
         opacity: 0;
 
         .btn-audio {
@@ -317,13 +341,16 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
 
         #pauseBtn,
         #playBtn {
-          fill: #fff
+          fill: #fff;
+        }
+
+        &.visible {
+          opacity: 1;
         }
 
         &:hover {
           opacity: 1;
         }
-
       }
 
       .cover-img {

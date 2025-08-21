@@ -100,20 +100,16 @@ const skipToState = computed(() => {
   return store.skipToState
 })
 
-
-
 /// watch
 
 watch(skipToState, (newValue, oldValue) => {
   if (newValue) {
-    console.log('watch skipToState ', newValue);
+    console.log('watch skipToState ', newValue)
     console.log('watch playingIndex ', playingIndex.value)
-    skipTo(playingIndex.value);
-    store.initSkip(false);
+    skipTo(playingIndex.value)
+    store.initSkip(false)
   }
-
 })
-
 
 watch(playing, (newValue, oldValue) => {
   seek.value = currentTrack.value.howl.seek()
@@ -131,7 +127,10 @@ watch(playing, (newValue, oldValue) => {
 watch(initPlay, (newValue, oldValue) => {
   console.log('initPlay ', newValue, oldValue)
   if (newValue) {
-    getPlaylist()
+    console.log('checkPause.value ', checkPause.value)
+    if (!checkPause.value) {
+      getPlaylist()
+    }
     play()
     // this.$store.commit("initPlay", false);
     store.initPlay(false)
@@ -175,6 +174,8 @@ const play = (index) => {
     (track) => track.path === currentTrack.value.path
   )
 
+  console.log('selectedTrackIndex', selectedTrackIndex)
+
   // console.log(
   //   'index selectedTrackIndex currentTrackIndex',
   //   index,
@@ -182,8 +183,10 @@ const play = (index) => {
   //   currentTrackIndex
   // )
 
+  /// if not index
   if (!index) {
     if (selectedTrack.value) {
+      /// if new track
       if (selectedTrack.value.path !== currentTrack.value.path) {
         stop()
       }
@@ -191,12 +194,13 @@ const play = (index) => {
     }
   }
   if (typeof index !== 'number') {
+    console.log('2121212121')
     index = playerIndex.value
   }
 
   console.log('играем index', index)
-  let track = playlist.value[index]
-  //console.log('track ', track)
+  const track = playlist.value[index]
+  console.log('track ', track)
   let trackPath = ''
 
   if (sourceNew == 'tracks') {
@@ -207,10 +211,14 @@ const play = (index) => {
     trackPath = `/stream/audio/${track.path}.mp3`
   }
 
-  console.log('trackPath ', trackPath)
+  console.log('track.howl ', track.howl)
 
+  /// if track is playing now - play from pause
   if (track.howl) {
+    console.log('from pause')
     player.value = track.howl
+
+    /// new track
   } else {
     player.value = track.howl = new Howl({
       src: [trackPath],
@@ -237,8 +245,8 @@ const play = (index) => {
 
   //console.log('player.value', player.value)
   player.value.play()
-  selectedTrack.value = playlist.value[index]
-  currentTrack.value = playlist.value[index]
+  /// selectedTrack, currentTrack
+  selectedTrack.value = currentTrack.value = playlist.value[index]
   playerIndex.value = index
   playerIsActive.value = true
   playing.value = true
@@ -261,7 +269,9 @@ const play = (index) => {
 const pause = (index) => {
   //console.log('pause', currentTrack.value.title)
   currentTrack.value.howl.pause()
-  playing.value = false
+  playing.value = false;
+
+  console.log('currentTrack.value.howl ', currentTrack.value.howl)
 }
 const stop = (index) => {
   //console.log('stop ', currentTrack.value.howl.playing())

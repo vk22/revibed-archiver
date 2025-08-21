@@ -1,0 +1,9 @@
+ffprobe -v error -f lavfi -i "amovie=A.flac,asetnsamples=11025,astats=metadata=1:reset=1" -show_entries frame=pts_time -show_entries frame_tags=lavfi.astats.Overall.Peak_level,lavfi.astats.Overall.RMS_level -of json
+
+
+ffprobe -v error -f lavfi -i "amovie=A.flac,asetnsamples=11025,astats=metadata=1:reset=1" -show_entries frame=pts_time -show_entries frame_tags=lavfi.astats.Overall.Peak_level,lavfi.astats.Overall.RMS_level -of json > stats.json
+
+
+ffmpeg -y -i A.flac -filter_complex "aformat=channel_layouts=mono,showwavespic=s=1200x200:colors=#22c55e" -frames:v 1 waveform.png
+
+ffmpeg -i A.flac -filter_complex "aformat=channel_layouts=mono,showwavespic=s=1200x300" -frames:v 1 waveform.png
