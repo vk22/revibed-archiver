@@ -1,29 +1,27 @@
 <template>
-  <div class="player-playlist-panel" :class="{ active: playlistPanelIsOpen }">
-    <div class="player-playlist-panel__header">
+  <div class="userPlaylist" :class="{ active: true }">
+    <div class="userPlaylist__header">
       <div class="panel-title">
-        <b>Playlist</b> — {{ $filters.toMinAndHours(playlistLength) }}
+        <b>Favorites</b> — {{ $filters.toMinAndHours(favoritesLength) }}
       </div>
-      <div class="panel-close" @click="store.setPlaylistPanelIsOpen()">
+      <!-- <div class="panel-close" @click="store.setPlaylistPanelIsOpen()">
         <button class="btn icon-btn">
           <v-icon small>mdi-close</v-icon>
         </button>
-      </div>
+      </div> -->
     </div>
-
-    <div>
-    </div>
-    <div class="items-container" :class="{ active: playlistPanelIsOpen }">
-      <div class="item" v-for="(item, index) in playlist" :key="index"
-        :class="{ playing: playingFile.filename === item.path }">
+    <div class="items-container" :class="{ active: true }">
+      <div class="item" v-for="(item, index) in userPlaylist.tracks" :key="index"
+        :class="{ playing: playingFile.filename === item.position + '. ' + item.title }">
         <div class="item_l">
           <div class="num">
             {{ index + 1 }}
           </div>
           <div class="cover">
-            <div class="track-player" :class="{ visible: !checkPause && playingFile.filename == item.path }">
+            <div class="track-player"
+              :class="{ visible: !checkPause && playingFile.filename == item.position + '. ' + item.title }">
               <div class="btn-audio pause" @click="pauseTrack(index)"
-                v-if="!checkPause && playingFile.filename == item.path">
+                v-if="!checkPause && playingFile.filename == item.position + '. ' + item.title">
                 <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink">
                   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
@@ -59,7 +57,6 @@
                 </svg>
               </div>
             </div>
-
             <img :src="'file://' + storageFolder + '/' + item.releaseID + '/cover.jpg'" class="cover-img" />
           </div>
           <div class="title">
@@ -81,7 +78,7 @@
               {{ $filters.minutes(item.duration) }}
             </div>
 
-            <div class="add-to" :class="{ 'in-playlist': checkIfTrackInUserPlaylist(item) }">
+            <div class="add-to" :class="{ 'in-favorites': checkIfTrackInUserPlaylist(item) }">
               <button class="btn icon-btn" @click="addToPlaylist(item)">
                 <v-icon small>mdi-heart</v-icon>
               </button>
@@ -102,28 +99,14 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = usePlayerStore()
 const storeMain = useMainStore()
-const props = defineProps(['playlistPanelIsOpen'])
+const props = defineProps(['favorites'])
 const storageFolder = computed(() => {
   return storeMain.getStorageFolder
 })
-const playlist = ref([])
-const playlistSource = ref(null)
-const playlistLength = ref(null)
-
-function getPlaylist() {
-  playlist.value = [...store.playlist]
-  playlistSource.value = store.source
-  if (playlistSource.value === 'radio') {
-    playlistLength.value = playlist.value.reduce((acc, cur) => (acc += cur.duration), 0)
-  }
-}
+const favoritesLength = ref(null)
 
 const playingFile = computed(() => {
   return store.playingFile
-})
-
-const playlistPanelIsOpen = computed(() => {
-  return store.playlistPanelIsOpen
 })
 
 const checkPause = computed(() => {
@@ -145,22 +128,41 @@ const checkIfTrackInUserPlaylist = (track) => {
 /// play contols
 
 const play = (track, index) => {
-  if (!checkPause.value) {
-    store.skipTo(index)
-  } else {
-    store.setSelectedTrack({
-      releaseID: track.releaseID,
-      title: track.path,
-      artist: track.artist,
-      path: track.path
-    })
 
-    store.play({
-      index: index,
-      filename: track.title,
-      releaseID: track.releaseID
-    })
+  store.setSelectedTrack({
+    position: track.position,
+    id: track._id,
+    releaseID: track.releaseID,
+    title: track.position + '. ' + track.title,
+    artist: track.artist,
+    path: track.position + '. ' + track.title,
+    howl: null,
+    display: true
+  })
+
+  const playlist = {
+    source: 'tracks',
+    tracks: []
   }
+  userPlaylist.value.tracks.forEach((track) => {
+    playlist.tracks.push({
+      position: track.position,
+      releaseID: track.releaseID,
+      title: track.position + '. ' + track.title,
+      artist: track.artist,
+      path: track.position + '. ' + track.title,
+      howl: null,
+      display: true
+    })
+  })
+  store.setPlaylist(playlist)
+
+  store.play({
+    index: index,
+    filename: track.title,
+    releaseID: track.releaseID
+  })
+
 }
 
 const pauseTrack = (index) => {
@@ -193,18 +195,10 @@ function goToRipPage(releaseID) {
   store.setPlaylistPanelIsOpen()
 }
 
-watch(playlistPanelIsOpen, (newValue, oldValue) => {
-  console.log('playlistPanelIsOpen ', newValue, oldValue)
-  if (newValue) {
-    getPlaylist()
-  } else {
-    //this.stop()
-  }
-})
 </script>
 
 <style lang="scss">
-@import '../../assets/scss/main.scss';
+@import '@/renderer/assets/scss/main.scss';
 
 @keyframes slide-in {
   from {
@@ -258,17 +252,16 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
   }
 }
 
-.player-playlist-panel {
-  position: fixed;
+.userPlaylist {
+  position: relative;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: calc(100vh - 60px);
+  width: 100%;
+  height: calc(100% - 60px);
   background: #fff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 6rem 0 1rem;
   box-shadow: 0 -0.125rem 1rem rgba(0, 0, 0, 0.075);
   transition: bottom 0.25s ease-in-out;
   z-index: 9999;
@@ -298,11 +291,11 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
   }
 
   .items-container {
-    width: 900px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    padding: 0rem;
+    padding: 1rem;
     height: 100%;
     overflow: scroll;
     opacity: 0;
@@ -320,6 +313,7 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
   }
 
   .item {
+    position: relative;
     display: flex;
     align-items: center;
     padding: 0.15rem 0.5rem;
@@ -419,7 +413,7 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
       .add-to {
         width: 10%;
 
-        &.in-playlist {
+        &.in-favorites {
 
           i {
             color: #de1d1d;
@@ -434,7 +428,7 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
   }
 
   &__close {
-    position: fixed;
+    position: relative;
     top: 0;
     right: 0;
     z-index: 9999;
@@ -442,7 +436,7 @@ watch(playlistPanelIsOpen, (newValue, oldValue) => {
   }
 
   &__header {
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;

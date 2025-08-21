@@ -16,18 +16,17 @@
             <div class="left">
               <router-link class="link" :to="{ name: 'NewProject' }">Add new</router-link>
               <router-link class="link" :to="{ name: 'RipsList' }">Releases</router-link>
+              <router-link class="link" :to="{ name: 'Favorites' }">Favorites</router-link>
             </div>
             <div class="right">
               <!-- <router-link class="link" :to="{ name: 'RipsList' }">Projects</router-link> -->
               <v-avatar>
-                <v-img
-                  alt="John"
-                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFroBand&accessoriesType=Wayfarers&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=Hoodie&clotheColor=Black&graphicType=Resist&eyeType=Cry&eyebrowType=RaisedExcitedNatural&mouthType=Serious&skinColor=DarkBrown"
-                ></v-img>
+                <v-img alt="John"
+                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFroBand&accessoriesType=Wayfarers&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=Hoodie&clotheColor=Black&graphicType=Resist&eyeType=Cry&eyebrowType=RaisedExcitedNatural&mouthType=Serious&skinColor=DarkBrown"></v-img>
               </v-avatar>
               <router-link class="link" :to="{ name: 'User' }" v-if="user">{{
                 user.username
-              }}</router-link>
+                }}</router-link>
               <!-- <div class="userkey" v-on:click="userLogout()" v-if="user">{{ user }}</div> -->
             </div>
           </div>

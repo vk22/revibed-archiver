@@ -101,13 +101,15 @@ export const usePlayerStore = defineStore('player', {
       console.log('startRadio ', track)
       // track.id = `${track.title}.flac`
       const firstTrack = await musicRecommendations.getTarget(track)
-      // console.log('firstTrack ', firstTrack)
+      console.log('firstTrack ', firstTrack)
       if (!firstTrack) {
         storeMain.setLoading({ state: false })
         alert('no track found')
         return false
       }
       this.setSelectedTrack({
+        id: track.id,
+        position: firstTrack.position,
         title: firstTrack.title,
         artist: firstTrack.artist,
         path: firstTrack.path,
@@ -135,6 +137,7 @@ export const usePlayerStore = defineStore('player', {
       let currentTrack = track
       playlist.tracks.push({
         releaseID: track.releaseID,
+        position: track.position,
         id: track.id,
         title: track.meta.title,
         artist: track.meta.artist,
@@ -151,6 +154,7 @@ export const usePlayerStore = defineStore('player', {
         //console.log('currentTrack ', currentTrack)
         playlist.tracks.push({
           releaseID: currentTrack.releaseID,
+          position: currentTrack.position,
           id: currentTrack.id,
           title: currentTrack.meta.title,
           artist: currentTrack.meta.artist,

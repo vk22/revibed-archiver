@@ -4,10 +4,23 @@
         <player-info-panel
         :trackInfo="getTrackInfo">
         </player-info-panel> -->
-    <player-controls-bars :loop="loop" :shuffle="shuffle" :progress="progress" :playing="playing"
-      :trackInfo="getTrackInfo" :waitingMusic="waitingMusic" :playerIsActive="playerIsActive" @playtrack="play"
-      @pausetrack="pause" @stoptrack="stop" @skiptrack="skip" @toggleloop="toggleLoop" @toggleshuffle="toggleShuffle"
-      @updateseek="setSeek" @updatevolume="setVolume">
+    <player-controls-bars
+      :loop="loop"
+      :shuffle="shuffle"
+      :progress="progress"
+      :playing="playing"
+      :trackInfo="getTrackInfo"
+      :waitingMusic="waitingMusic"
+      :playerIsActive="playerIsActive"
+      @playtrack="play"
+      @pausetrack="pause"
+      @stoptrack="stop"
+      @skiptrack="skip"
+      @toggleloop="toggleLoop"
+      @toggleshuffle="toggleShuffle"
+      @updateseek="setSeek"
+      @updatevolume="setVolume"
+    >
     </player-controls-bars>
     <!-- <div class="toggle-panel" @click="playlistPanelIsOpen = !playlistPanelIsOpen">
       <button class="btn icon-btn">
@@ -269,7 +282,7 @@ const play = (index) => {
 const pause = (index) => {
   //console.log('pause', currentTrack.value.title)
   currentTrack.value.howl.pause()
-  playing.value = false;
+  playing.value = false
 
   console.log('currentTrack.value.howl ', currentTrack.value.howl)
 }

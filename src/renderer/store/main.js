@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { isProxy, toRaw } from 'vue'
+import { useUserStore } from './user'
 
 //const API_URL_TOOLS = 'http://localhost:3000';
 const API_URL_TOOLS = 'https://tools.revibed.com/api'
@@ -9,6 +10,8 @@ const API_TOKEN_REVIBED = 'ozs6tZrfHNCSS4HnfRPvpvgVGbBj2JakfPyEXAtJcXukGNxCouBW2
 
 export const useMainStore = defineStore('main', {
   state: () => ({
+    user: undefined,
+    playlist: [],
     allReleases: [],
     releases: [],
     releasesExtraFieldValues: [],
@@ -108,6 +111,90 @@ export const useMainStore = defineStore('main', {
       })
       return response
     },
+    async createPlaylist(user, track) {
+      const response = await axios.post(`${API_URL_TOOLS}/create-playlist/`,
+        { user: user, track: track }, {
+        headers: {
+          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+        }
+      })
+      return response
+    },
+    async getPlaylist(user) {
+      const response = await axios.get(`${API_URL_TOOLS}/get-playlist/${user}`, {
+        headers: {
+          'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+        }
+      })
+      return response
+    },
+    async addToPlaylist(track) {
+      console.log('STORE addToPlaylist ', track)
+      if (this.playlist) {
+
+        // add to store
+        this.playlist.tracks.push(track);
+
+        // add to db
+        const response = await axios.put(
+          `${API_URL_TOOLS}/edit-playlist/${this.playlist._id}`, { playlist: this.playlist },
+          {
+            headers: {
+              'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+            }
+          }
+        )
+        console.log('response ', response.data)
+        /// update from db
+        if (response.data.success) {
+          const getPlaylistData = await this.getPlaylist(this.user);
+          if (getPlaylistData.data.success) {
+            this.setPlaylist(getPlaylistData.data)
+          }
+        }
+
+      } else {
+        const userStore = useUserStore();
+        const username = (userStore) ? userStore.user.username : undefined;
+        const createResponse = await this.createPlaylist(username, track);
+        console.log('createResponse ', createResponse)
+
+        const getPlaylistData = await this.getPlaylist(this.user);
+        if (getPlaylistData.data.success) {
+          this.setPlaylist(getPlaylistData.data)
+        }
+
+        return createResponse
+      }
+
+
+    },
+    async removeFromPlaylist(track) {
+      console.log('STORE removeFromPlaylist ', track)
+      // remove from store
+      const findIndex = this.playlist.tracks.findIndex(item => item.releaseID === track.releaseID && item.position === track.position);
+      if (findIndex > -1) {
+        this.playlist.tracks.splice(findIndex, 1)
+      }
+      //this.playlist.tracks = this.playlist.tracks.filter(item => item.releaseID !== track.releaseID && item.position !== track.position);
+      // add to db
+      const response = await axios.put(
+        `${API_URL_TOOLS}/edit-playlist/${this.playlist._id}`, { playlist: this.playlist },
+        {
+          headers: {
+            'x-api-key': 'l74b9ba9qmext9a6ulniigq8'
+          }
+        }
+      )
+      console.log('response ', response.data)
+      /// update from db
+      if (response.data.success) {
+        const getPlaylistData = await this.getPlaylist(this.user);
+        if (getPlaylistData.data.success) {
+          this.setPlaylist(getPlaylistData.data)
+        }
+      }
+    },
     async getYoutubes() {
       const response = await axios.get(`${API_URL_TOOLS}/get-youtubes`)
       return response
@@ -158,30 +245,38 @@ export const useMainStore = defineStore('main', {
     },
     async getServerData() {
       console.time('getAllData')
-      this.allDataReady = false
-      const getRevibedGoodsData = await this.getRevibedGoods()
-      // console.log('getRevibedGoodsData response ', getRevibedGoodsData.data.data.length)
+      this.allDataReady = false;
+
+      const userStore = useUserStore();
+      this.user = (userStore) ? userStore.user.username : undefined;
+
+      const getRevibedGoodsData = await this.getRevibedGoods();
       if (getRevibedGoodsData.data.success) {
         this.setRevibedGoods(getRevibedGoodsData.data.data)
       }
-      const getReleasesData = await this.getServerDataReleases()
-      // console.log('getReleases response ', getReleasesData.data)
+      const getReleasesData = await this.getServerDataReleases();
       if (getReleasesData.data.success) {
         this.setReleases(getReleasesData.data)
       }
-      const releasesExtraFieldValues = await this.getServerDataReleasesExtraFieldValues()
-      // console.log('releasesExtraFieldValues response ', releasesExtraFieldValues.data)
+      const releasesExtraFieldValues = await this.getServerDataReleasesExtraFieldValues();
       if (releasesExtraFieldValues.data.success) {
         this.setReleasesExtraFieldValues(releasesExtraFieldValues.data)
       }
+
+      const getPlaylistData = await this.getPlaylist(this.user);
+
+      if (getPlaylistData.data.success) {
+        this.setPlaylist(getPlaylistData.data)
+      }
+
 
       this.userLocalFolders = await window.mainApi.invoke('getUserLocalData')
       this.storageFolder = toRaw(this.userLocalFolders).storageFolder
       // console.log('storageFolder ', this.storageFolder)
       this.allDataReady = true
-      console.timeEnd('getAllData')
+      console.timeEnd('getAllData');
+
       const getTracksData = await this.getTracks()
-      // console.log('getTracksData ', getTracksData)
       if (getTracksData.data.success) {
         this.tracks = getTracksData.data.tracks
       }
@@ -258,6 +353,10 @@ export const useMainStore = defineStore('main', {
       setTimeout(() => {
         this.setStyles()
       }, 1000)
+    },
+    setPlaylist(data) {
+      this.playlist = data.playlists[0];
+      console.log('setPlaylist ', this.playlist)
     },
     setStyles(data) {
       let allStyles = this.allReleases.reduce((acc, curr) => {
@@ -675,12 +774,12 @@ export const useMainStore = defineStore('main', {
       if (release) {
         const localPath = `${storageFolder}/${release.releaseID}`
         release.localPath = localPath
-        console.log('storageFolder localPath', localPath)
+        //console.log('storageFolder localPath', localPath)
         return release
       }
     },
     getReleaseTracks: (state) => (id) => {
-      console.log('getReleaseTracks ', id)
+      //console.log('getReleaseTracks ', id)
       if (state.tracks.length) {
         return state.tracks.filter((item) => item.releaseID === id).reverse()
       }

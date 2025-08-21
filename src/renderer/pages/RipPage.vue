@@ -137,6 +137,7 @@ const play = (index, filename, releaseID) => {
   }
   tracks.value.forEach((track) => {
     playlist.tracks.push({
+      position: track.position,
       releaseID: rip.value.releaseID,
       title: track.position + '. ' + track.title,
       artist: rip.value.artist,
@@ -166,120 +167,7 @@ watch(ripCover, (newValue, oldValue) => {
 onMounted(() => {})
 </script>
 
-<!-- <script>
 
-import TracksOneTrack from '../components/TracksOneTrack.vue'
-
-export default {
-  props: [],
-  components: {
-    TracksOneTrack
-  },
-  data() {
-    return {
-      loading: false,
-      dialog: false,
-      responseStatus: undefined
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    //this.checkIfOrderEmpty()
-    clearInterval(this.t)
-    next()
-  },
-  methods: {
-    play(index, filename, projectID) {
-      var playlist = {
-        source: 'tracks',
-        tracks: []
-      }
-      var play = {
-        index: index,
-        filename: filename,
-        projectID: projectID
-      }
-      this.rip.tracklist.forEach((track) => {
-        playlist.tracks.push({ projectID: this.rip.projectID, projecFormat: this.rip.format, title: track.position + '. ' + track.title, artist: this.rip.artist, path: track.position + '. ' + track.title, howl: null, display: true })
-      })
-      this.$store.commit('setPlaylist', playlist)
-      this.$store.commit('play', play)
-    },
-    pause(index) {
-      this.$store.commit('pause', index)
-    },
-    setPlaylist() {
-      var playlist = {
-        source: 'tracks',
-        tracks: []
-      }
-      console.log('this.rip ', this.rip)
-      this.rip.tracklist.forEach((track) => {
-        if (typeof track === 'object') {
-          playlist.tracks.push({ projectID: this.rip.projectID, title: track.position + '. ' + track.title, artist: this.rip.artist, path: track.position + '. ' + track.title, howl: null, display: true })
-        } else {
-          playlist.tracks.push({ projectID: this.rip.projectID, title: track, artist: this.rip.artist, path: track, howl: null, display: true })
-        }
-      })
-      this.$store.commit('setPlaylist', playlist)
-    },
-    async archiveRip() {
-      this.$store.commit('setLoading', true)
-      const responseRip = await this.$axios.post('http://localhost:8000/api/archive-rip/', { rip: this.rip })
-      console.log('responseRip ', responseRip)
-      this.$store.commit('setLoading', false)
-    },
-    async deleteRip() {
-      this.$store.commit('setLoading', true)
-      const responseRip = await this.$axios.delete('http://localhost:8000/api/delete-rip/' + this.rip.projectID)
-      console.log('responseRip ', responseRip)
-      this.$store.commit('setLoading', false)
-      this.dialog = false;
-      this.$store.dispatch('getRips')
-      this.$router.push('/rips-list');
-    },
-    async sendToRevibed() {
-      this.$store.commit('setLoading', true)
-      const responseRip = await this.$axios.post('http://localhost:8000/api/send-to-revibed/', { rip: this.rip })
-      console.log('responseRip ', responseRip)
-      this.$store.commit('setLoading', false)
-    },
-
-    async getTracklist() {
-      const responsegetTracklist = await this.$axios.post('http://localhost:8000/api/edit-rip-tracklist/', { releaseID: this.rip.releaseID, projectID: this.rip.projectID })
-      console.log('responseRip ', responsegetTracklist)
-    },
-    goToPrev() {
-      this.$router.go(-1);
-      //this.$router.push('/rips-list')
-    },
-
-  },
-  mounted() {
-    console.log('this.$router ', this.$route.params.id)
-    // this.$router.push({ path: '/one-rip/111723' })
-  },
-  computed: {
-    filesPath() {
-      return this.$store.getters.getFilesPath
-    },
-    rip() {
-      return this.$store.getters.getReleaseOne(this.$route.params.id);
-    },
-    playingFile() {
-      return this.$store.state.player.playingFile;
-    },
-  },
-  created() {
-    setTimeout(() => {
-      //this.setPlaylist()
-    }, 8000);
-
-  },
-  watch: {
-
-  }
-}
-</script> -->
 
 <style lang="scss">
 @import '../assets/scss/main.scss';

@@ -1,27 +1,11 @@
 <template>
   <div class="track-card-small" v-if="track">
     <div class="track-player">
-      <div
-        class="btn-audio pause"
-        @click="pauseTrack(index)"
-        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title"
-      >
-        <svg
-          width="22px"
-          height="30px"
-          viewBox="0 0 22 30"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <g
-            id="Page-1"
-            stroke="none"
-            stroke-width="1"
-            fill="none"
-            fill-rule="evenodd"
-            opacity="0.900928442"
-          >
+      <div class="btn-audio pause" @click="pauseTrack(index)"
+        v-if="!checkPause && playingFile.filename == track.position + '. ' + track.title">
+        <svg width="22px" height="30px" viewBox="0 0 22 30" version="1.1" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
             <g id="pauseBtn" fill="#000000">
               <g id="Page-1">
                 <g id="Desktop-HD-Copy-3">
@@ -39,32 +23,11 @@
           </g>
         </svg>
       </div>
-      <div
-        class="btn-audio play"
-        @click="selectAndPlay(track, index, track.title, rip.projectID)"
-        v-else
-      >
-        <svg
-          width="26px"
-          height="32px"
-          viewBox="0 0 26 32"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <g
-            id="Page-1"
-            stroke="none"
-            stroke-width="1"
-            fill="none"
-            fill-rule="evenodd"
-            opacity="0.900928442"
-          >
-            <g
-              id="Desktop-HD-Copy-3"
-              transform="translate(-97.000000, -1135.000000)"
-              fill="#000000"
-            >
+      <div class="btn-audio play" @click="selectAndPlay(track, index, track.title, rip.projectID)" v-else>
+        <svg width="26px" height="32px" viewBox="0 0 26 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900928442">
+            <g id="Desktop-HD-Copy-3" transform="translate(-97.000000, -1135.000000)" fill="#000000">
               <g id="player" transform="translate(0.000000, 1112.000000)">
                 <g id="Group-4" transform="translate(49.000000, 23.000000)">
                   <polygon id="Triangle" points="74 16 48 32 48 0"></polygon>
@@ -86,15 +49,12 @@
 
       <div class="track-info__r">
         <div class="add-to">
-          <button
-            class="btn icon-btn"
-            @click="startRadio(track, index, track.title, rip.projectID)"
-          >
+          <button class="btn icon-btn" @click="startRadio(track, index, track.title, rip.projectID)">
             <v-icon small>mdi-access-point</v-icon>
           </button>
         </div>
-        <div class="add-to">
-          <button class="btn icon-btn" disabled>
+        <div class="add-to" :class="{ 'in-playlist': checkIfTrackInUserPlaylist }">
+          <button class="btn icon-btn" @click="addToPlaylist(track, index, track.title, rip.projectID)">
             <v-icon small>mdi-heart</v-icon>
           </button>
         </div>
@@ -106,7 +66,9 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { usePlayerStore } from '@/renderer/store/player'
+import { useMainStore } from '@/renderer/store/main'
 const store = usePlayerStore()
+const storeMain = useMainStore()
 
 const props = defineProps(['track', 'index', 'rip'])
 const emit = defineEmits(['playtrack', 'pausetrack', 'startRadio'])
@@ -125,8 +87,17 @@ const playingFile = computed(() => {
 const checkPause = computed(() => {
   return store.onPause
 })
-const playlist = computed(() => {
-  return store.playlist
+const userPlaylist = computed(() => {
+  return storeMain.playlist
+})
+
+const checkIfTrackInUserPlaylist = computed(() => {
+  console.log('userPlaylist ', userPlaylist.value)
+  if (userPlaylist.value) {
+    return userPlaylist.value.tracks.some(item => item.releaseID === props.track.releaseID && item.position === props.track.position)
+  } else {
+    return false
+  }
 })
 
 ////
@@ -139,6 +110,8 @@ const selectAndPlay = (track, index, title, releaseID) => {
 const selectTrack = (track) => {
   console.log('rip ', props.rip)
   store.setSelectedTrack({
+    position: track.position,
+    id: track._id,
     releaseID: props.rip.releaseID,
     title: track.position + '. ' + track.title,
     artist: props.rip.artist,
@@ -158,6 +131,26 @@ const startRadio = (track) => {
     howl: null,
     display: true
   })
+}
+
+const addToPlaylist = (track) => {
+  console.log('addToPlaylist', checkIfTrackInUserPlaylist.value)
+  if (checkIfTrackInUserPlaylist.value) {
+    storeMain.removeFromPlaylist({
+      position: track.position,
+      releaseID: props.rip.releaseID,
+      title: track.title,
+      artist: props.rip.artist
+    })
+  } else {
+    storeMain.addToPlaylist({
+      position: track.position,
+      releaseID: props.rip.releaseID,
+      title: track.title,
+      artist: props.rip.artist
+    })
+  }
+
 }
 
 const playTrack = () => {
@@ -193,6 +186,7 @@ const pauseTrack = () => {
   }
 
   &.play {
+
     // background-image: url('../assets/img/playBtn.svg');
     svg {
       width: 14px;
@@ -201,6 +195,7 @@ const pauseTrack = () => {
   }
 
   &.pause {
+
     // background-image: url('../assets/img/pauseBtn.svg');
     svg {
       width: 14px;
@@ -210,6 +205,7 @@ const pauseTrack = () => {
 }
 
 .trackItem {
+
   // transition: transform .25s 1s;
   // transform: translateY(10px);
   &.disabled {
@@ -269,8 +265,7 @@ const pauseTrack = () => {
       align-items: center;
       flex-direction: row-reverse;
 
-      .track-duration {
-      }
+      .track-duration {}
 
       .add-to {
         // display: flex;
@@ -290,12 +285,11 @@ const pauseTrack = () => {
           // }
         }
 
-        .btn.in-playlist {
-          background: #212529;
-          color: #fff;
+        &.in-playlist {
 
+          // opacity: .2;
           i {
-            color: #fff;
+            color: #de1d1d;
           }
         }
       }
@@ -305,7 +299,7 @@ const pauseTrack = () => {
   &.playing {
     background: #f7f7f7;
 
-    & > .track-trackname {
+    &>.track-trackname {
       opacity: 0.5;
     }
   }
@@ -313,7 +307,7 @@ const pauseTrack = () => {
   &:hover {
     cursor: pointer;
 
-    & > .track-trackname {
+    &>.track-trackname {
       opacity: 0.5;
     }
   }

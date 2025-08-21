@@ -4,6 +4,7 @@ import RipsList from '@/renderer/pages/RipsList'
 import RipPage from '@/renderer/pages/RipPage'
 import Login from '@/renderer/pages/Login'
 import User from '@/renderer/pages/User'
+import Favorites from '@/renderer/pages/Favorites'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useUserStore } from '@/renderer/store/user'
 
@@ -33,6 +34,12 @@ const routes = [
     path: '/rip-page/:id',
     name: 'RipPage',
     component: RipPage,
+    meta: { requiresAuth: true, middleware: auth }
+  },
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: Favorites,
     meta: { requiresAuth: true, middleware: auth }
   },
   {
